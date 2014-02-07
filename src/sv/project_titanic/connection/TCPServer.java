@@ -1,3 +1,5 @@
+package sv.project_titanic.connection;
+
 import java.io.*;
 import java.net.*;
 
