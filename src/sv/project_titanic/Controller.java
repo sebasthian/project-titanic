@@ -10,46 +10,10 @@ public class Controller {
   /**
 	 * Class constructor. 
 	 */
-	public control(){
+	public Controller(){
 		
 		
 	}
-	/**
-	 * Translate the x-coordinate from event to column index.
-	 * @param x 	the x-coordinate from event.
-	 * @return 		the index of the actual column.
-	 */
-	public int mouseXtoCol(int x){  //Behöver fixas till, beror på hur vi dimensionerar board.
-		int column = x; 
-		
-		if(x >= 0 && x < board.getXdim()){
-			return column;
-		}
-		return -1;
-	}
-	/**
-	 * Translate the y-coordinate from event to row index.
-	 * @param y 	the y-coordinate from event.
-	 * @return  	the index of the actual row.
-	 */
-	public int mouseYtoRow(int y){   //Behöver fixas till, beror på hur vi dimensionerar board.
-		int row = y; 
-		
-		if(y >= 0 && y < board.getYdim()){
-			return row;
-		}
-		return -1;
-	}
-	
-	/**
-	 * 
-	 * @param x 
-	 * @param y 
-	 */
-	public boolean isClickable(int x, int y){   //Bättre om denna finns i GUI?
-		return true;
-	}
-	
 	/**
 	 * Tries to shoot at a given coordinate.
 	 * @param x  	x-coordinate from event.
@@ -85,7 +49,7 @@ public class Controller {
 	 * @param c   object of coordinate.
 	 * @return 		true if coordinate not been shot before, otherwise false.
 	 */
-	public boolean canPlaceShoot(Coordinate c){
+	public boolean canPlaceShot(Coordinate c){
 		int x = c.getX();		
 		int y = c.getY();
 		
