@@ -78,7 +78,7 @@ public class Controller {
 			}else if(status == 0){
 				board.setFieldStatus(x,y,status+1);
 			}else{
-				for(Ship shit : fleet){
+				for(Ship ship : fleet){
 					if(ship.hasCoordinates(c)){
 						ship.shipHit(c);
 					}
