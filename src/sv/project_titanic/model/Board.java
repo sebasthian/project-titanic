@@ -1,7 +1,7 @@
 package sv.project_titanic.model;
 
 import java.util.ArrayList;
-
+import java.util.Observable;
 
 public class Board extends Observable
 {
@@ -21,9 +21,9 @@ public class Board extends Observable
 	
 	private void initializeFieldStatus(ArrayList<Ship> ships)
 	{
-		for(i=0 ; i<boardX ; i++)
+		for(int i=0 ; i<boardX ; i++)
 		{
-			for(j=0 ; j<boardY; j++)
+			for(int j=0 ; j<boardY; j++)
 			{
 				coordList[i][j].add(new Coordinate(i, j));
 				

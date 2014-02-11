@@ -1,6 +1,7 @@
 package sv.project_titanic.model;
-import java.util.ArrayList;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 
 public class Ship 
 {
