@@ -30,7 +30,7 @@ public class GUI extends JFrame {
 
         for(int row = 0; row < 10; row++) {
             for(int col = 0; col < 10; col++) {
-                if(homeBoard.getStatus(col, row) == 2)
+                if(homeBoard.getFieldStatus(col, row) == 2)
                     homeGrid.getCell(row, col).setColor(SHIP_COLOR);
             }
         }
