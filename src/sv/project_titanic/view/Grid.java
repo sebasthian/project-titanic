@@ -9,13 +9,14 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.util.ArrayList;
+import java.util.Observable;
 import java.util.List;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import javax.swing.JOptionPane;
 
-public class Grid extends JPanel {
+public class Grid extends JPanel implements Observable {
     private int columnCount;
     private int rowCount;
     private int cellWidth;
@@ -64,6 +65,29 @@ public class Grid extends JPanel {
 
             addMouseListener(mouseListener);
             addMouseMotionListener(mouseListener);
+        }
+    }
+
+    public void update(Observable o, Object arg) {
+        int[] message = (int[])arg;
+
+        int x = message[0];
+        int y = message[1];
+        int status = message[2];
+
+        Cell cell = getCell(y, x);
+
+        switch(status) {
+            case 0: cell.setColor(GUI.EMPTY_COLOR);
+                    break;
+            case 1: cell.setColor(GUI.SHIP_COLOR);
+                    break;
+            case 2: cell.setColor(GUI.MISS_COLOR);
+                    break;
+            case 3: cell.setColor(GUI.HIT_COLOR);
+                    break;
+            case 4: cell.setColor(GUI.SUNK_COLOR);
+                    break;
         }
     }
 

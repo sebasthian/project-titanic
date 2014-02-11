@@ -10,11 +10,11 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
 public class GUI extends JFrame {
-    private final Color SHIP_COLOR = Color.BLACK;
-    private final Color EMPTY_COLOR = Color.BLUE;
-    private final Color MISS_COLOR = new Color(100, 100, 255);
-    private final Color HIT_COLOR = Color.RED;
-    private final Color SUNK_COLOR = Color.GREEN;
+    private final static Color SHIP_COLOR = Color.BLACK;
+    private final static Color EMPTY_COLOR = Color.BLUE;
+    private final static Color MISS_COLOR = new Color(100, 100, 255);
+    private final static Color HIT_COLOR = Color.RED;
+    private final static Color SUNK_COLOR = Color.GREEN;
 
     private Grid homeGrid;
     private Grid awayGrid;
