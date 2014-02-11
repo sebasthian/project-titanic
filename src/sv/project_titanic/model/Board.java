@@ -51,7 +51,7 @@ public class Board extends Observable
 	public void setFieldStatus(int x, int y, int status)
 	{
 		fieldStatus[x][y] = status;
-		hasChanged();
+		setChanged();
 		int[] message = {x, y, status};
 		notifyObservers(message);
 	}
