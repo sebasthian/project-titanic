@@ -3,10 +3,9 @@ package sv.project_titanic.connection;
 import java.io.*;
 import java.net.*;
 
-public class TCPClient
-{
-	public TCPClient() throws Exception{
-	/*
+class TCPClient{
+	public static void main(String argv[]) throws Exception{
+	
 		String input;
 		String modifiedInput;
 		
@@ -28,6 +27,5 @@ public class TCPClient
 		modifiedInput = fromServer.readLine();
 		System.out.println("FROM SERVER: " + modifiedInput);
 		clientSocket.close();
-		*/
 	}
 }
