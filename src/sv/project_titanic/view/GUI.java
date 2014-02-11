@@ -1,5 +1,7 @@
 package sv.project_titanic.view;
 
+import sv.project_titanic.model.*;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.GridLayout;
@@ -10,11 +12,11 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
 public class GUI extends JFrame {
-    private final static Color SHIP_COLOR = Color.BLACK;
-    private final static Color EMPTY_COLOR = Color.BLUE;
-    private final static Color MISS_COLOR = new Color(100, 100, 255);
-    private final static Color HIT_COLOR = Color.RED;
-    private final static Color SUNK_COLOR = Color.GREEN;
+    public final static Color SHIP_COLOR = Color.BLACK;
+    public final static Color EMPTY_COLOR = Color.BLUE;
+    public final static Color MISS_COLOR = new Color(100, 100, 255);
+    public final static Color HIT_COLOR = Color.RED;
+    public final static Color SUNK_COLOR = Color.GREEN;
 
     private Grid homeGrid;
     private Grid awayGrid;
@@ -22,34 +24,21 @@ public class GUI extends JFrame {
     private JLabel awayPlayer;
     private JLabel turnMessage;
 
-    public static void main(String[] args) {
-        new GUI();
-    }
-
-    public GUI() {
+    public GUI(Board homeBoard, Player homePlayer, Player awayPlayer) {
         homeGrid = new Grid(10, 10, false);
         awayGrid = new Grid(10, 10, true);
 
-        homeGrid.getCell(5, 5).setColor(SHIP_COLOR);
-        homeGrid.getCell(5, 6).setColor(SHIP_COLOR);
-        homeGrid.getCell(5, 7).setColor(SHIP_COLOR);
+        for(int row = 0; row < 10; row++) {
+            for(int col = 0; col < 10; col++) {
+                if(homeBoard.getStatus(col, row) == 2)
+                    homeGrid.getCell(row, col).setColor(SHIP_COLOR);
+            }
+        }
 
-        homeGrid.getCell(2, 1).setColor(HIT_COLOR);
-        homeGrid.getCell(3, 1).setColor(SHIP_COLOR);
-
-        homeGrid.getCell(9, 3).setColor(SUNK_COLOR);
-        homeGrid.getCell(9, 4).setColor(SUNK_COLOR);
-        homeGrid.getCell(9, 5).setColor(SUNK_COLOR);
-        homeGrid.getCell(9, 6).setColor(SUNK_COLOR);
-                             
-        homeGrid.getCell(1, 1).setColor(MISS_COLOR);
-        homeGrid.getCell(3, 5).setColor(MISS_COLOR);
-        homeGrid.getCell(9, 9).setColor(MISS_COLOR);
-        homeGrid.getCell(6, 6).setColor(MISS_COLOR);
-        homeGrid.getCell(3, 9).setColor(MISS_COLOR);
-
-        homePlayer = new JLabel("player 1");
-        awayPlayer = new JLabel("player 2");
+        //this.homePlayer = new JLabel(homePlayer.getName());
+        //this.awayPlayer = new JLabel(awayPlayer.getname());
+        this.homePlayer = new JLabel("player 1");
+        this.awayPlayer = new JLabel("player 2");
         turnMessage = new JLabel("Your turn");
 
         buildFrame();

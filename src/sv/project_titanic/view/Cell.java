@@ -16,8 +16,8 @@ class Cell extends Rectangle {
         return this.color;
     }
 
-    public void setColor(Color color) {
-        this.color = color;
+    public void setColor(Color c) {
+        this.color = c;
     }
 }
 

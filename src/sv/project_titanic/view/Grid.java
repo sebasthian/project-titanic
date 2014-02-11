@@ -10,13 +10,14 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.Observable;
+import java.util.Observer;
 import java.util.List;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import javax.swing.JOptionPane;
 
-public class Grid extends JPanel implements Observable {
+public class Grid extends JPanel implements Observer {
     private int columnCount;
     private int rowCount;
     private int cellWidth;
