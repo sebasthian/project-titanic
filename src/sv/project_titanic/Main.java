@@ -6,8 +6,8 @@ import sv.project_titanic.view.*;
 
 public class Main {
     public static void main(String[] args) {
-        Board homeBoard = new Board(10, 10, new Ship[5]);
-        Board awayBoard = new Board(10, 10, new Ship[5]);
+        Board homeBoard = new Board(10, 10, new Ship[0]);
+        Board awayBoard = new Board(10, 10, new Ship[0]);
 
         Player homePlayer = new Player();
         Player awayPlayer = new Player();
