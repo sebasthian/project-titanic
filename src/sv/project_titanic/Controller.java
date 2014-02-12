@@ -53,7 +53,7 @@ public class Controller {
 		int x = c.getX();		
 		int y = c.getY();
 		
-		int status = board.getFieldStatus(x,y);
+		int status = Board.getFieldStatus(x,y);
 						
 		if(status == 0 || status == 2){
 			return true;
@@ -71,19 +71,19 @@ public class Controller {
 			int x = c.getX();
 			int y = c.getY();
 			
-			int status = board.getFieldStatus(x,y);
+			int status = Board.getFieldStatus(x,y);
 			
 			if(status == 1 || status == 3){
 				throw new InvalidShotException(c, "This field has allready been hit.");
 			}else if(status == 0){
-				board.setFieldStatus(x,y,status+1);
+				Board.setFieldStatus(x,y,status+1);
 			}else{
 				for(Ship ship : fleet){
-					if(ship.hasCoordinates(c)){
-						ship.shipHit(c);
+					if(Ship.hasCoordinates(c)){
+						Ship.shipHit(c);
 					}
 				}
-				board.setFieldStatus(x,y,status+1);
+				Board.setFieldStatus(x,y,status+1);
 			}
 		}
 	}
@@ -116,12 +116,12 @@ public class Controller {
 			int y = currentCoord.getY();
 			
 			//Om det redan finns en båt på denna koordinat.
-			if(board.getFieldStatus(x,y) != 0){
+			if(Board.getFieldStatus(x,y) != 0){
 				return false;
 			} 
 
 			// Är vi utanför spelbrädan?
-			if(x >= board.getYdim() || y >= board.getXdim()){
+			if(x >= Board.getYdim() || y >= Board.getXdim()){
 				return false;
 			}
 		}
@@ -145,12 +145,12 @@ public class Controller {
 				int x = newCoord.getX();
 				int y = newCoord.getY();
 				
-				int status = board.fieldStatus(x,y);
+				int status = Board.fieldStatus(x,y);
 				
 				if( status == 2){
 					throw new FieldOccupiedException(newCoord, "Field occupied.");
 				} else {
-					board.setFieldStatus(x,y,status);
+					Board.setFieldStatus(x,y,status);
 				}
 				fleet.add(s);
 			}
