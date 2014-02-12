@@ -15,6 +15,11 @@ public class Board extends Observable
 	{
 		this.boardX = x;
 		this.boardY = y;
+
+		fleet = new ArrayList<>();
+		fieldStatus = new int[x][y];
+		coordList = new Coordinate[x][y];
+
 		addFleet(fleetArray);
 		initializeFieldStatus(fleet);
 	}
@@ -25,7 +30,7 @@ public class Board extends Observable
 		{
 			for(int j=0 ; j<boardY; j++)
 			{
-				coordList[i][j].add(new Coordinate(i, j));
+				coordList[i][j] = new Coordinate(i, j);
 				
 				for(Ship boat : ships)
 				{
