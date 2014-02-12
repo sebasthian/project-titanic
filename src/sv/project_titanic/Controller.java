@@ -66,25 +66,23 @@ public class Controller {
 	 * @param c   object containing coordinate.
 	 * @throws 		InvalidShotException is thrown if the field has already been shot.
 	 */
-	public void placeShot(Coordinate c){
-		throws InvalidShotException{
-			int x = c.getX();
-			int y = c.getY();
-			
-			int status = board.getFieldStatus(x,y);
-			
-			if(status == 1 || status == 3){
-				throw new InvalidShotException(c, "This field has allready been hit.");
-			}else if(status == 0){
-				board.setFieldStatus(x,y,status+1);
-			}else{
-				for(Ship ship : fleet){
-					if(ship.hasCoordinates(c)){
-						ship.shipHit(c);
-					}
+	public void placeShot(Coordinate c) throws InvalidShotException{
+		int x = c.getX();
+		int y = c.getY();
+
+		int status = board.getFieldStatus(x,y);
+
+		if(status == 1 || status == 3){
+			throw new InvalidShotException(c, "This field has allready been hit.");
+		}else if(status == 0){
+			board.setFieldStatus(x,y,status+1);
+		}else{
+			for(Ship ship : fleet){
+				if(ship.hasCoordinates(c)){
+					ship.shipHit(c);
 				}
-				board.setFieldStatus(x,y,status+1);
 			}
+			board.setFieldStatus(x,y,status+1);
 		}
 	}
 	/**
@@ -134,26 +132,24 @@ public class Controller {
 	 * @throws 		FieldOccupiedException if the field already 
 	 * 				    has a ship placed on that coordinate.
 	 */	
-	public void placeShip(Ship s){
-		throws FieldOccupiedException {
-			
-			Iterator<Coordinate> itr = s.coords.iterator();
-			
-			while(itr.hasNext()){
-				Coordinate newCoord = itr.next();
-				
-				int x = newCoord.getX();
-				int y = newCoord.getY();
-				
-				int status = board.fieldStatus(x,y);
-				
-				if( status == 2){
-					throw new FieldOccupiedException(newCoord, "Field occupied.");
-				} else {
-					board.setFieldStatus(x,y,status);
-				}
-				fleet.add(s);
+	public void placeShip(Ship s) throws FieldOccupiedException {
+
+		Iterator<Coordinate> itr = s.coords.iterator();
+
+		while(itr.hasNext()){
+			Coordinate newCoord = itr.next();
+
+			int x = newCoord.getX();
+			int y = newCoord.getY();
+
+			int status = board.fieldStatus(x,y);
+
+			if( status == 2){
+				throw new FieldOccupiedException(newCoord, "Field occupied.");
+			} else {
+				board.setFieldStatus(x,y,status);
 			}
+			fleet.add(s);
 		}
 	}
 }
