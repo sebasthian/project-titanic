@@ -5,23 +5,26 @@ import java.util.Iterator;
 
 public class Ship 
 {
-	private ArrayList<Coordinate> coords;
+	private static ArrayList<Coordinate> coords;
+
 	
-	public Ship(Coordinate[] inputCoords)
-	{
-		ArrayList<Coordinate> coords = new ArrayList<Coordinate>();
+	public Ship(ArrayList<Coordinate> inputCoords){
+		coords = new ArrayList<Coordinate>();
 		addShip(inputCoords);
 	}
 	
 	/**
 	 * Private method to add coords to arrayList.
 	 */
-	private void addShip(Coordinate[] input)
+	private void addShip(ArrayList<Coordinate> inputCoords)
 	{
-		for(Coordinate inputCoord : input)
+		for(Coordinate inputCoord : inputCoords)
 		{
 			coords.add(inputCoord);
 		}
+	}
+	public ArrayList<Coordinate> getCoords(){
+		return coords;
 	}
 	
 	
