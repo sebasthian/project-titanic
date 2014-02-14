@@ -1,5 +1,6 @@
 package sv.project_titanic.view;
 
+import sv.project_titanic.Controller;
 import sv.project_titanic.model.*;
 
 import java.awt.BorderLayout;
@@ -11,7 +12,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
-public class GUI extends JFrame {
+public class GUI extends JFrame implements Runnable {
     public final static Color SHIP_COLOR = Color.BLACK;
     public final static Color EMPTY_COLOR = Color.BLUE;
     public final static Color MISS_COLOR = new Color(100, 100, 255);
@@ -24,9 +25,12 @@ public class GUI extends JFrame {
     private JLabel awayPlayer;
     private JLabel turnMessage;
 
-    public GUI(Board homeBoard, Player homePlayer, Player awayPlayer) {
-        homeGrid = new Grid(10, 10, false);
-        awayGrid = new Grid(10, 10, true);
+    public GUI(Board homeBoard, Board awayBoard, Player homePlayer, Player awayPlayer, Controller controller) {
+        homeGrid = new Grid(10, 10);
+        awayGrid = new Grid(10, 10, controller);
+
+        homeBoard.addObserver(homeGrid);
+        awayBoard.addObserver(awayGrid);
 
         for(int row = 0; row < 10; row++) {
             for(int col = 0; col < 10; col++) {
@@ -35,16 +39,12 @@ public class GUI extends JFrame {
             }
         }
 
-        //this.homePlayer = new JLabel(homePlayer.getName());
-        //this.awayPlayer = new JLabel(awayPlayer.getname());
-        this.homePlayer = new JLabel("player 1");
-        this.awayPlayer = new JLabel("player 2");
+        this.homePlayer = new JLabel(homePlayer.getPlayerName());
+        this.awayPlayer = new JLabel(awayPlayer.getPlayerName());
         turnMessage = new JLabel("Your turn");
-
-        buildFrame();
     }
 
-    private void buildFrame() {
+    public void run() {
         setTitle("Project Titanic");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 

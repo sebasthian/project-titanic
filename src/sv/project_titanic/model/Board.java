@@ -35,7 +35,6 @@ public class Board extends Observable
 			}
 		}
 		
-		
 		addFleet(fleetArray);
 		//initializeFieldStatus(fleetArray);
 		
@@ -93,6 +92,9 @@ public class Board extends Observable
 	{
 		return fieldStatus[x][y];
 	}
-	
-	
+
+	public ArrayList<Ship> getFleet()
+	{
+		return fleet;
+	}
 }
