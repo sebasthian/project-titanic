@@ -1,18 +1,30 @@
 package sv.project_titanic;
 
-import java.awt.*;
-import javax.swing.*;
+import sv.project_titanic.model.*;
+
+
 import java.util.ArrayList;
 import java.util.Iterator;
 
+
+
 public class Controller {
   
+	private Board currentBoard;
+	private Board awayBoard;
+	private	Board homeBoard;
+	private boolean playerTurn;
+	private Ship ship;
+	private ArrayList<Coordinate> coord;
+	
+	
   /**
 	 * Class constructor. 
 	 */
-	public Controller(){
-		
-		
+	public Controller(Board ab, Board hb, boolean turn){
+		awayBoard = ab;
+		homeBoard = hb;
+		playerTurn = turn;
 	}
 	/**
 	 * Tries to shoot at a given coordinate.
@@ -21,27 +33,18 @@ public class Controller {
 	 */
 	public void shoot(Coordinate c){
 		
-		int result = 0;
+		//int result = 0;
 		
-		if(canPlaceShot(c)){
-			try {
-				result = placeShot(c);
+		if(playerTurn){
+			
+			currentBoard = awayBoard;
+			
+			if(canPlaceShot(c)){
+				placeShot(c);		
 			}
-			catch(InvalidShotException e){
-				//Hur ska vi hantera den? Hur hanterar vi status i programmet?
-			}
-			if(result == 1){
-				//MISS
-			} else if(result == 3){
-				//TRÄFF
-			} else if(result == 4){
-				//Sänkt skäpp
-			}		
-		} else {
-			//Något gick fel.
 		}
 		if(isGameOver()){
-			//Spelet är slut
+
 		}
 	}
 	/**
@@ -53,7 +56,7 @@ public class Controller {
 		int x = c.getX();		
 		int y = c.getY();
 		
-		int status = Board.getFieldStatus(x,y);
+		int status = currentBoard.getFieldStatus(x,y);
 						
 		if(status == 0 || status == 2){
 			return true;
@@ -64,26 +67,38 @@ public class Controller {
 	/**
 	 * Place a shot on the given coordinate. 
 	 * @param c   object containing coordinate.
-	 * @throws 		InvalidShotException is thrown if the field has already been shot.
+	 * @return 
 	 */
-	public void placeShot(Coordinate c) throws InvalidShotException{
+	public int placeShot(Coordinate c){
+		
 		int x = c.getX();
 		int y = c.getY();
-
-		int status = board.getFieldStatus(x,y);
-
+			
+		int status = currentBoard.getFieldStatus(x,y);
+			
 		if(status == 1 || status == 3){
-			throw new InvalidShotException(c, "This field has allready been hit.");
+			//Redan beskjuten ruta.
+			//skicka statusmeddelande till logg-f�nstret.
+			return -1;
 		}else if(status == 0){
-			board.setFieldStatus(x,y,status+1);
-		}else{
-			for(Ship ship : fleet){
-				if(ship.hasCoordinates(c)){
+			status++;
+			currentBoard.setFieldStatus(x,y,status);
+			
+			return status;
+		} else{
+			for(Ship ship : currentBoard.getFleet()){
+				if(ship.hasCoordinate(c)){
 					ship.shipHit(c);
+					break;
 				}
 			}
 			board.setFieldStatus(x,y,status+1);
 		}
+		
+		currentBoard.setFieldStatus(x,y,status+1);
+			
+		return status+1;
+		
 	}
 	/**
 	 * Checks if fleet still contains coordinate. If it does, 
@@ -91,12 +106,12 @@ public class Controller {
 	 * @return 		true if fleet is empty, otherwise false.
 	 */
 	public boolean isGameOver(){
-		if(fleet.isEmpty()){
-			return true;
+		for(Ship ship : currentBoard.getFleet()){
+			if(!ship.noMoreShip()){
+				return false;				
+			}
 		}
-		else {
-			return false;
-		}
+		return true;
 	}
 	/**
 	 * Check if the ship can be placed on the board.
@@ -105,7 +120,7 @@ public class Controller {
 	 */
 	public boolean canPlaceShip(Ship s){
 		
-		Iterator<Coordinate> itr = s.coords.iterator();
+		Iterator<Coordinate> itr = coord.iterator();
 		
 		while(itr.hasNext()){
 			Coordinate currentCoord = itr.next();
@@ -114,12 +129,12 @@ public class Controller {
 			int y = currentCoord.getY();
 			
 			//Om det redan finns en båt på denna koordinat.
-			if(Board.getFieldStatus(x,y) != 0){
+			if(currentBoard.getFieldStatus(x,y) != 0){
 				return false;
 			} 
 
 			// Är vi utanför spelbrädan?
-			if(x >= Board.getYdim() || y >= Board.getXdim()){
+			if(x >= currentBoard.getYdim() || y >= currentBoard.getXdim()){
 				return false;
 			}
 		}
@@ -132,25 +147,24 @@ public class Controller {
 	 * @throws 		FieldOccupiedException if the field already 
 	 * 				    has a ship placed on that coordinate.
 	 */	
-	public void placeShip(Ship s) throws FieldOccupiedException {
+	public void placeShip(Ship s){
+			Iterator<Coordinate> itr = coord.iterator();
+			
+			while(itr.hasNext()){
+				Coordinate newCoord = itr.next();
+				
+				int x = newCoord.getX();
+				int y = newCoord.getY();
+				
+				int status = currentBoard.getFieldStatus(x,y);
+				
+				if( status == 2){
 
-		Iterator<Coordinate> itr = s.coords.iterator();
-
-		while(itr.hasNext()){
-			Coordinate newCoord = itr.next();
-
-			int x = newCoord.getX();
-			int y = newCoord.getY();
-
-			int status = board.fieldStatus(x,y);
-
-			if( status == 2){
-				throw new FieldOccupiedException(newCoord, "Field occupied.");
-			} else {
-				board.setFieldStatus(x,y,status);
+				} else {
+					currentBoard.setFieldStatus(x,y,status);
+				}
+				//ship.add(s);
 			}
-			fleet.add(s);
-		}
 	}
 }
 

@@ -10,7 +10,8 @@ import sv.project_titanic.view.*;
 public class Main {
     public static void main(String[] args) {
     	ArrayList<Coordinate> coord = new ArrayList<Coordinate>();
-    	ArrayList<Ship> ship = new ArrayList<Ship>();
+    	ArrayList<Ship> shipp1 = new ArrayList<Ship>();
+    	ArrayList<Ship> shipp2 = new ArrayList<Ship>();
     	
     	Coordinate coord1 = new Coordinate(1,1);
     	Coordinate coord2 = new Coordinate(1,2);
@@ -21,10 +22,12 @@ public class Main {
     	coord.add(coord3);
     	
     	Ship ship1 = new Ship(coord);
-    	ship.add(ship1);
+    	Ship ship2 = new Ship(coord);
+    	shipp1.add(ship1);
+    	shipp2.add(ship2);
     	
-        Board homeBoard = new Board(10, 10, ship);
-        Board awayBoard = new Board(10, 10, ship);
+        Board homeBoard = new Board(10, 10, shipp1);
+        Board awayBoard = new Board(10, 10, shipp2);
 
         Player homePlayer = new Player("player1");
         Player awayPlayer = new Player("player2");
