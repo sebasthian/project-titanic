@@ -15,6 +15,9 @@ import java.util.List;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import sv.project_titanic.Controller;
+import sv.project_titanic.model.Coordinate;
+
 import javax.swing.JOptionPane;
 
 public class Grid extends JPanel implements Observer {
@@ -23,11 +26,11 @@ public class Grid extends JPanel implements Observer {
     private int cellWidth;
     private int cellHeight;
     private List<Cell> cells;
-    private Point selectedCell;
+    private Coordinate selectedCell;
     private boolean gridInvalid;
     private final Color SELECTED_MASK = new Color(255, 255, 255, 50);
 
-    public Grid(int rows, int columns, boolean active) {
+    public Grid(int rows, int columns) {
         rowCount = rows;
         columnCount = columns;
         cells = new ArrayList<>(columnCount * rowCount);
@@ -37,36 +40,39 @@ public class Grid extends JPanel implements Observer {
 
         gridInvalid = true;
         selectedCell = null;
-    
-        if(active) {
-            MouseAdapter mouseListener = new MouseAdapter() {
-                @Override
-                public void mouseMoved(MouseEvent e) {
-                    selectedCell = translatePosition(e.getPoint());
-                    repaint();
-                }
-                
-                @Override
-                public void mouseExited(MouseEvent e) {
-                    selectedCell = null;
-                    repaint();
-                }
+    }
 
-                @Override
-                public void mouseClicked(MouseEvent e) {
-                    if(selectedCell != null) {
-                        JOptionPane.showMessageDialog(
-                            getTopLevelAncestor(),
-                            "Cell (" + selectedCell.x + ", " +
-                            selectedCell.y + ") clicked."
-                        );
-                    }
-                }
-            };
+    public Grid(int rows, int columns, final Controller controller) {
+        this(rows, columns);
 
-            addMouseListener(mouseListener);
-            addMouseMotionListener(mouseListener);
-        }
+        MouseAdapter mouseListener = new MouseAdapter() {
+            @Override
+            public void mouseMoved(MouseEvent e) {
+                selectedCell = translatePosition(e.getPoint());
+                repaint();
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                selectedCell = null;
+                repaint();
+            }
+
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if(selectedCell != null) {
+                    //JOptionPane.showMessageDialog(
+                    //    getTopLevelAncestor(),
+                    //    "Cell (" + selectedCell.x + ", " +
+                    //    selectedCell.y + ") clicked."
+                    //);
+                    controller.shoot(selectedCell);
+                }
+            }
+        };
+
+        addMouseListener(mouseListener);
+        addMouseMotionListener(mouseListener);
     }
 
     public void update(Observable o, Object arg) {
@@ -81,9 +87,9 @@ public class Grid extends JPanel implements Observer {
         switch(status) {
             case 0: cell.setColor(GUI.EMPTY_COLOR);
                     break;
-            case 1: cell.setColor(GUI.SHIP_COLOR);
+            case 1: cell.setColor(GUI.MISS_COLOR);
                     break;
-            case 2: cell.setColor(GUI.MISS_COLOR);
+            case 2: cell.setColor(GUI.SHIP_COLOR);
                     break;
             case 3: cell.setColor(GUI.HIT_COLOR);
                     break;
@@ -96,11 +102,11 @@ public class Grid extends JPanel implements Observer {
         return cells.get(col + row*columnCount);
     }
 
-    public Cell getCell(Point cell) {
-        return getCell(cell.y, cell.x);
+    public Cell getCell(Coordinate coord) {
+        return getCell(coord.getY(), coord.getX());
     }
 
-    public Point translatePosition(Point p) {
+    public Coordinate translatePosition(Point p) {
         int column = p.x / cellWidth;
         if(column >= columnCount)
             column = columnCount-1;
@@ -109,7 +115,7 @@ public class Grid extends JPanel implements Observer {
         if(row >= rowCount)
             row = rowCount-1;
 
-        return new Point(column, row);
+        return new Coordinate(column, row);
     }
 
     @Override

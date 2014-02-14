@@ -1,7 +1,9 @@
 package sv.project_titanic;
 
 import java.util.ArrayList;
+import javax.swing.SwingUtilities;
 
+import sv.project_titanic.*;
 import sv.project_titanic.model.*;
 import sv.project_titanic.view.*;
 
@@ -24,12 +26,14 @@ public class Main {
         Board homeBoard = new Board(10, 10, ship);
         Board awayBoard = new Board(10, 10, ship);
 
-        Player homePlayer = new Player();
-        Player awayPlayer = new Player();
+        Player homePlayer = new Player("player1");
+        Player awayPlayer = new Player("player2");
 
-        //Controller controller = new Controller();
+        Controller controller = new Controller(awayBoard, homeBoard, true);
 
-        GUI gui = new GUI(homeBoard, homePlayer, awayPlayer);
+        GUI gui = new GUI(homeBoard, awayBoard, homePlayer, awayPlayer, controller);
+
+        SwingUtilities.invokeLater(gui);
     }
 }
 

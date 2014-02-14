@@ -92,6 +92,9 @@ public class Board extends Observable
 	{
 		return fieldStatus[x][y];
 	}
-	
-	
+
+	public ArrayList<Ship> getFleet()
+	{
+		return fleet;
+	}
 }
