@@ -4,13 +4,14 @@
  *
  */
 
-
 package sv.project_titanic.connection;
 import java.io.*;
 import java.net.*;
 
+
 public class TCPServer implements Runnable
 {
+	
 	//private Thread runner;
 	private ServerSocket serverSocket;
 	private int port;
@@ -27,7 +28,7 @@ public class TCPServer implements Runnable
 	public void run() 
 	{
 		listen();
-		onAccept();
+		onAccepted();
 		System.out.println(Thread.currentThread());
 	}
 	
@@ -55,30 +56,56 @@ public class TCPServer implements Runnable
 	 * This method contains the server main loop.
 	 * Relays the communication between the clients.
 	 */
-	private void onAccept()
+	private void onAccepted()
 	{
 		try {
-			Socket clientSocket1 = serverSocket.accept();
-			//Socket clientSocket2 = serverSocket.accept();
-            DataOutputStream toClient1 = new DataOutputStream(clientSocket1.getOutputStream());
-			//DataOutputStream toClient2 = new DataOutputStream(clientSocket2.getOutputStream());
-            BufferedReader fromClient1 = new BufferedReader(new InputStreamReader(clientSocket1.getInputStream()));
-            //BufferedReader fromClient2 = new BufferedReader(new InputStreamReader(clientSocket1.getInputStream()));
 			
-            toClient1.writeByte(1);
-			//toClient2.writeByte(1);
-            
-            System.out.println("client connected!");
+			Socket clientSocket1 = serverSocket.accept();
+			ObjectOutputStream toClient1 = new ObjectOutputStream(clientSocket1.getOutputStream());
+			ObjectInputStream fromClient1 = new ObjectInputStream(clientSocket1.getInputStream());
+			//toClient1.writeByte(ConnectionMessages.CLIENT_CONNECTED);
+			
+			//Socket clientSocket2 = serverSocket.accept();
+            //DataOutputStream toClient2 = new DataOutputStream(clientSocket2.getOutputStream());
+            //BufferedReader fromClient2 = new BufferedReader(new InputStreamReader(clientSocket1.getInputStream()));
+			//toClient2.writeByte(ConnectionMessages.CLIENT_CONNECTED);
+			
+		
+
 			while(!serverSocket.isClosed())
 			{
-				//do stuff.
+				
+				Object obj = fromClient1.readObject();
+				if(obj instanceof String) {
+					System.out.println("Server: Client says '" + (String)obj + "'" );
+					toClient1.writeObject("MESSAGE BACK TO YOU :) : " + obj);
+				}
+				
+				
+				//int ch = -1;
+				//while(clientSocket1.getInputStream().read() != -1)
+				//{
+				//	System.out.println("client 1: " + ch);
+				//}
+				
+				/*while(clientSocket2.getInputStream().read() != -1)
+				{
+					System.out.println("client 2: " + ch);
+				}*/
+				
 				//serverSocket.close();
 			}
+			
 			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
+		
+		
 		
 	}
 	
