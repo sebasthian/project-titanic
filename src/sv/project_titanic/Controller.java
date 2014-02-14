@@ -53,7 +53,7 @@ public class Controller {
 		int x = c.getX();		
 		int y = c.getY();
 		
-		int status = board.getFieldStatus(x,y);
+		int status = Board.getFieldStatus(x,y);
 						
 		if(status == 0 || status == 2){
 			return true;
@@ -114,12 +114,12 @@ public class Controller {
 			int y = currentCoord.getY();
 			
 			//Om det redan finns en båt på denna koordinat.
-			if(board.getFieldStatus(x,y) != 0){
+			if(Board.getFieldStatus(x,y) != 0){
 				return false;
 			} 
 
 			// Är vi utanför spelbrädan?
-			if(x >= board.getYdim() || y >= board.getXdim()){
+			if(x >= Board.getYdim() || y >= Board.getXdim()){
 				return false;
 			}
 		}
