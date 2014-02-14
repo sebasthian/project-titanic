@@ -78,7 +78,6 @@ public class Controller {
 			
 		if(status == 1 || status == 3){
 			//Redan beskjuten ruta.
-			//skicka statusmeddelande till logg-fönstret.
 			return -1;
 		}else if(status == 0){
 			status++;
@@ -92,7 +91,7 @@ public class Controller {
 					break;
 				}
 			}
-			board.setFieldStatus(x,y,status+1);
+			currentBoard.setFieldStatus(x,y,status+1);
 		}
 		
 		currentBoard.setFieldStatus(x,y,status+1);
