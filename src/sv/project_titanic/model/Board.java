@@ -14,7 +14,7 @@ public class Board extends Observable
 	public int[][] fieldStatus;
 	private ArrayList<Coordinate> coordList;
 	
-	public Board(int xdim, int ydim, ArrayList<Ship> fleetArray)
+	public Board(int xdim, int ydim)
 	{
 		this.boardX = xdim;
 		this.boardY = ydim;
@@ -28,45 +28,15 @@ public class Board extends Observable
 				fieldStatus[i][j] = 0;
 			}
 		}
-		
-		for(Ship ship : fleetArray){
-			for(Coordinate c : ship.getCoords() ){
-				setFieldStatus(c.getX(),c.getY(), 2);
-			}
-		}
-		
-		addFleet(fleetArray);
-		//initializeFieldStatus(fleetArray);
-		
 	}
 	
-	/*private void initializeFieldStatus(ArrayList<Ship> ships)
+	public void addShip(Ship ship)
 	{
-		//Coordinate c = new Coordinate(x,y);
-		
-		for(int i=0 ; i<boardX ; i++){
-			for(int j=0 ; j<boardY; j++){
-				coordList.add(c);
-				
-				for(Ship boat : ships)
-				{
-					if(boat.hasCoordinate())
-					{
-						fieldStatus[i][j] = 2;
-					}
-					else
-						fieldStatus[i][j] = 0;
-				}
-			}
-		}		
-	}*/
-	
+		fleet.add(ship);
 
-	private void addFleet(ArrayList<Ship> ship)
-	{
-		for(Ship boat : ship)
+		for(Coordinate c : ship.getCoords())
 		{
-			fleet.add(boat);
+			setFieldStatus(c.getX(), c.getY(), 2);
 		}
 	}
 	
