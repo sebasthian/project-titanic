@@ -96,8 +96,8 @@ public class GUI extends JFrame implements Runnable {
         selectedShip = shipLengths.get(0);
         orientation = "horizontal";
 
-        this.homePlayer = new JLabel(homePlayer.getPlayerName());
-        this.awayPlayer = new JLabel(awayPlayer.getPlayerName());
+        this.homePlayer = new JLabel(homePlayer.getName());
+        this.awayPlayer = new JLabel(awayPlayer.getName());
         turnMessage = new JLabel("Your turn");
     }
 
