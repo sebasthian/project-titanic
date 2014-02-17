@@ -113,18 +113,7 @@ public class Grid extends JPanel implements Observer {
 
 		Cell cell = getCell(row, column);
 
-		switch(status) {
-			case 0: cell.setColor(GUI.EMPTY_COLOR);
-					break;
-			case 1: cell.setColor(GUI.MISS_COLOR);
-					break;
-			case 2: cell.setColor(GUI.SHIP_COLOR);
-					break;
-			case 3: cell.setColor(GUI.HIT_COLOR);
-					break;
-			case 4: cell.setColor(GUI.SUNK_COLOR);
-					break;
-		}
+		cell.setColor(GUI.COLOR_MAP.get(status));
 	}
 
 	/**Translate a pixel position into a logical coordinate on this grid. Used

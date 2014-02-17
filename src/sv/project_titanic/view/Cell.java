@@ -11,7 +11,7 @@ class Cell extends Rectangle {
 	public Cell() {
 		super();
 
-		this.color = GUI.EMPTY_COLOR;
+		this.color = GUI.COLOR_MAP.get(0);
 	}
 
 	/**

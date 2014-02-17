@@ -3,94 +3,51 @@ package sv.project_titanic.view;
 import sv.project_titanic.Controller;
 import sv.project_titanic.model.*;
 
-import java.awt.BorderLayout;
-import java.awt.CardLayout;
-import java.awt.Color;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.GridLayout;
+import java.awt.*;
+import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import javax.swing.*;
 import javax.swing.border.*;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.SwingConstants;
-import javax.swing.JTextArea;
 
 public class GUI extends JFrame implements Runnable {
-	public final static Color SHIP_COLOR = Color.BLACK;
-	public final static Color EMPTY_COLOR = Color.BLUE;
-	public final static Color MISS_COLOR = new Color(100, 100, 255);
-	public final static Color HIT_COLOR = Color.RED;
-	public final static Color SUNK_COLOR = Color.GREEN;
+	public final static HashMap<Integer, Color> COLOR_MAP;
+	static {
+		COLOR_MAP = new HashMap<>();
+		COLOR_MAP.put(0, Color.BLUE);
+		COLOR_MAP.put(1, new Color(100, 100, 255));
+		COLOR_MAP.put(2, Color.BLACK);
+		COLOR_MAP.put(3, Color.RED);
+		COLOR_MAP.put(4, Color.GREEN);
+	}
 
+	//Main game data
 	private Grid homeGrid;
 	private Grid awayGrid;
-	private Grid shipInitGrid;
 	private JLabel homePlayer;
 	private JLabel awayPlayer;
 	private JLabel turnMessage;
 	private JButton initDoneButton;
-	private JTextArea shipPreview;
 	private Controller controller;
+
+	//Init phase data
 	private List<Integer> shipLengths;
 	private Integer selectedShip;
 	private String orientation;
+	private Grid shipInitGrid;
 
 	public GUI(Board homeBoard, Board awayBoard, Player homePlayer, Player awayPlayer, Controller controller) {
 		this.controller = controller;
 
-		homeGrid = new Grid(10, 10, false);
-		awayGrid = new Grid(10, 10, true);
-		shipInitGrid = new Grid(10, 10, true);
-
-		awayGrid.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				if(awayGrid.hasSelection()) {
-					GUI.this.controller.shoot(awayGrid.getSelectedCell());
-				}
-			}
-		});
-
-		shipInitGrid.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				if(selectedShip != -1 && shipInitGrid.hasSelection()) {
-					Ship ship = makeShip();
-					if(GUI.this.controller.canPlaceShip(ship)) {
-						GUI.this.controller.placeShip(ship);
-						shipLengths.remove(selectedShip);
-						if(shipLengths.size() == 0) {
-							selectedShip = -1;
-							shipPreview.setText("All ships placed");
-							initDoneButton.setEnabled(true);
-						}
-						else {
-							selectedShip = shipLengths.get(0);
-							shipPreview.setText(getPreviewText());
-						}
-					}
-				}
-			}
-		});
+		homeGrid = new Grid(homeBoard.getYdim(), homeBoard.getYdim(), false);
+		awayGrid = new Grid(awayBoard.getYdim(), awayBoard.getXdim(), true);
+		shipInitGrid = new Grid(homeBoard.getYdim(), homeBoard.getXdim(), true);
 
 		homeBoard.addObserver(homeGrid);
 		homeBoard.addObserver(shipInitGrid);
 		awayBoard.addObserver(awayGrid);
-
-		for(int row = 0; row < 10; row++) {
-			for(int col = 0; col < 10; col++) {
-				if(homeBoard.getFieldStatus(col, row) == 2)
-					homeGrid.getCell(row, col).setColor(SHIP_COLOR);
-			}
-		}
 
 		shipLengths = new ArrayList<>(Arrays.asList(5,4,3,3,2));
 		selectedShip = shipLengths.get(0);
@@ -106,21 +63,40 @@ public class GUI extends JFrame implements Runnable {
 
 		Coordinate cell = shipInitGrid.getSelectedCell();
 
-		for(int i = 0; i < selectedShip; i++) {
-			if(orientation == "horizontal")
+		if(orientation == "horizontal") {
+			for(int i = 0; i < selectedShip; i++)
 				coords.add(new Coordinate(cell.getX() + i, cell.getY()));
-			else if(orientation == "vertical") {
+		}
+		else if(orientation == "vertical") {
+			for(int i = 0; i < selectedShip; i++)
 				coords.add(new Coordinate(cell.getX(), cell.getY() + i));
-			}
 		}
 
 		return new Ship(coords);
 	}
 
-	private String getPreviewText() {
-		return "Size: " + selectedShip + "\n" + "Orientation: " + orientation;
+	private void placeShip() {
+		if(selectedShip != -1 && shipInitGrid.hasSelection()) {
+			Ship ship = makeShip();
+
+			if(controller.canPlaceShip(ship)) {
+				controller.placeShip(ship);
+				shipLengths.remove(selectedShip);
+
+				if(shipLengths.size() == 0)
+					selectedShip = -1;
+				else
+					selectedShip = shipLengths.get(0);
+			}
+		}
 	}
 
+	private String getPreviewText() {
+		if(selectedShip == -1)
+			return "All ships placed!";
+		else
+			return "Size: " + selectedShip + "\n" + "Orientation: " + orientation;
+	}
 
 	public void run() {
 		setTitle("Project Titanic");
@@ -128,35 +104,59 @@ public class GUI extends JFrame implements Runnable {
 
 		setLayout(new CardLayout());
 
-		//Ship init
+		JPanel shipInitCard = buildShipInitCard();
+		add(shipInitCard);
+
+		JPanel mainGameCard = buildMainGameCard();
+		add(mainGameCard);
+
+		pack();
+		setLocationRelativeTo(null);
+		setVisible(true);
+	}
+
+	private JPanel buildShipInitCard() {
 		JPanel shipInitCard = new JPanel(new BorderLayout());
 
-		JPanel shipInitArea = new JPanel(new GridLayout(1, 2, 6, 0));
-
-		shipInitArea.add(shipInitGrid);
+		JPanel mainArea = new JPanel(new GridLayout(1, 2, 6, 0));
+		mainArea.add(shipInitGrid);
 
 		JPanel shipPreviewPane = new JPanel(new GridLayout(0, 1));
 		shipPreviewPane.add(new JLabel("Ship to place:"));
-		shipPreview = new JTextArea(getPreviewText());
+
+		final JTextArea shipPreview = new JTextArea(getPreviewText());
 		shipPreview.setEditable(false);
 		shipPreviewPane.add(shipPreview);
-		JButton rotateButton = new JButton("Rotate");
 
+		shipInitGrid.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				placeShip();
+
+				if(selectedShip == -1) 
+					initDoneButton.setEnabled(true);
+
+				shipPreview.setText(getPreviewText());
+			}
+		});
+
+		JButton rotateButton = new JButton("Rotate");
 		rotateButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if(orientation == "horizontal")
-			orientation = "vertical";
+					orientation = "vertical";
 				else
-			orientation = "horizontal";
+					orientation = "horizontal";
 
-		shipPreview.setText(getPreviewText());
+				shipPreview.setText(getPreviewText());
 			}
 		});
 
 		shipPreviewPane.add(rotateButton);
-		shipInitArea.add(shipPreviewPane);
 
-		shipInitCard.add(shipInitArea, BorderLayout.CENTER);
+		mainArea.add(shipPreviewPane);
+
+		shipInitCard.add(mainArea, BorderLayout.CENTER);
 
 		initDoneButton = new JButton("Finished");
 		initDoneButton.setEnabled(false);
@@ -169,9 +169,10 @@ public class GUI extends JFrame implements Runnable {
 
 		shipInitCard.add(initDoneButton, BorderLayout.SOUTH);
 
-		add(shipInitCard);
-
-		//Main game
+		return shipInitCard;
+	}
+	
+	private JPanel buildMainGameCard() {
 		JPanel mainGameCard = new JPanel(new BorderLayout());
 
 		JPanel statusArea = new JPanel(new BorderLayout());
@@ -191,13 +192,18 @@ public class GUI extends JFrame implements Runnable {
 		gameArea.add(homeGrid);
 		gameArea.add(awayGrid);
 
+		awayGrid.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if(awayGrid.hasSelection()) {
+					controller.shoot(awayGrid.getSelectedCell());
+				}
+			}
+		});
+
 		mainGameCard.add(gameArea, BorderLayout.CENTER);
 
-		add(mainGameCard);
-
-		pack();
-		setLocationRelativeTo(null);
-		setVisible(true);
+		return mainGameCard;
 	}
 }
 
