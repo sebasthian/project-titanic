@@ -1,172 +1,211 @@
 package sv.project_titanic.view;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Point;
-import java.awt.Rectangle;
+import java.awt.*;
+import java.awt.event.*;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
-import java.util.List;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import sv.project_titanic.Controller;
 import sv.project_titanic.model.Coordinate;
 
-import javax.swing.JOptionPane;
-
+/**A visual representation of a game board.*/
 public class Grid extends JPanel implements Observer {
-    private int columnCount;
-    private int rowCount;
-    private int cellWidth;
-    private int cellHeight;
-    private List<Cell> cells;
-    private Coordinate selectedCell;
-    private boolean gridInvalid;
-    private final Color SELECTED_MASK = new Color(255, 255, 255, 50);
+	private final Color SELECTED_MASK = new Color(255, 255, 255, 50);
 
-    public Grid(int rows, int columns, boolean active) {
-        rowCount = rows;
-        columnCount = columns;
-        cells = new ArrayList<>(columnCount * rowCount);
+	private int columnCount;
+	private int rowCount;
+	private int cellWidth;
+	private int cellHeight;
+	private List<Cell> cells;
+	private Coordinate selectedCell;
+	private boolean gridInvalid;
 
-        for(int i = 0; i < rowCount*columnCount; i++)
-            cells.add(new Cell());
+	/**Create a new grid of specified size, with or without highlighting of
+	 * cells.
+	 *
+	 * @param rows the height of the grid
+	 * @param columns the width of the grid
+	 * @param highlighting Cells are highlighted on mouseover if true.
+	 */
+	public Grid(int rows, int columns, boolean active) {
+		rowCount = rows;
+		columnCount = columns;
+		cells = new ArrayList<>(columnCount * rowCount);
 
-        gridInvalid = true;
-        selectedCell = null;
+		for(int i = 0; i < rowCount*columnCount; i++)
+			cells.add(new Cell());
 
-        if(active) {
-            MouseAdapter mouseListener = new MouseAdapter() {
-                @Override
-                public void mouseMoved(MouseEvent e) {
-                    selectedCell = translatePosition(e.getPoint());
-                    repaint();
-                }
+		gridInvalid = true;
+		selectedCell = null;
 
-                @Override
-                public void mouseExited(MouseEvent e) {
-                    selectedCell = null;
-                    repaint();
-                }
-            };
+		if(active) {
+			MouseAdapter mouseListener = new MouseAdapter() {
+				@Override
+				public void mouseMoved(MouseEvent e) {
+					selectedCell = translatePosition(e.getPoint());
+					repaint();
+				}
 
-            addMouseMotionListener(mouseListener);
-            addMouseListener(mouseListener);
-        }
-    }
+				@Override
+				public void mouseExited(MouseEvent e) {
+					selectedCell = null;
+					repaint();
+				}
+			};
 
-    public boolean hasSelection() {return selectedCell != null;}
-    public Coordinate getSelectedCell() {return selectedCell;}
+			addMouseMotionListener(mouseListener);
+			addMouseListener(mouseListener);
+		}
+	}
 
-    public void update(Observable o, Object arg) {
-        int[] message = (int[])arg;
+	/**
+	 * @return true if a cell is selected
+	 */
+	public boolean hasSelection() {
+		return selectedCell != null;
+	}
 
-        int x = message[0];
-        int y = message[1];
-        int status = message[2];
+	/**
+	 * @return the coordinates of the selected cell, or null if no cell
+	 *         selected
+	 */
+	public Coordinate getSelectedCell() {
+		return selectedCell;
+	}
 
-        Cell cell = getCell(y, x);
+	/**
+	 * @param row the row (y-coordinate) of the cell to get
+	 * @param column the column (x-coordinate) of the cell to get
+	 *
+	 * @return the cell at (column, row)
+	 */
+	public Cell getCell(int row, int column) {
+		return cells.get(column + row*columnCount);
+	}
 
-        switch(status) {
-            case 0: cell.setColor(GUI.EMPTY_COLOR);
-                    break;
-            case 1: cell.setColor(GUI.MISS_COLOR);
-                    break;
-            case 2: cell.setColor(GUI.SHIP_COLOR);
-                    break;
-            case 3: cell.setColor(GUI.HIT_COLOR);
-                    break;
-            case 4: cell.setColor(GUI.SUNK_COLOR);
-                    break;
-        }
-    }
+	/**
+	 * @param coord the coordinates of the cell to get
+	 *
+	 * @return the cell at coord
+	 */
+	public Cell getCell(Coordinate coord) {
+		return getCell(coord.getY(), coord.getX());
+	}
 
-    public Cell getCell(int row, int col) {
-        return cells.get(col + row*columnCount);
-    }
+	/**Update this grid when an observed object changes. Observable objects
+	 * that have registered this grid as an observer will call this method
+	 * when they change.
+	 *
+	 * @param o the observable that has changed
+	 * @param arg the data that has changed. Should be an int array on the
+	 *            form [x, y, status], representing a changed cell.
+	 */
+	public void update(Observable o, Object arg) {
+		int[] message = (int[])arg;
 
-    public Cell getCell(Coordinate coord) {
-        return getCell(coord.getY(), coord.getX());
-    }
+		int column = message[0];
+		int row = message[1];
+		int status = message[2];
 
-    public Coordinate translatePosition(Point p) {
-        int column = p.x / cellWidth;
-        if(column >= columnCount)
-            column = columnCount-1;
+		Cell cell = getCell(row, column);
 
-        int row = p.y / cellHeight;
-        if(row >= rowCount)
-            row = rowCount-1;
+		switch(status) {
+			case 0: cell.setColor(GUI.EMPTY_COLOR);
+					break;
+			case 1: cell.setColor(GUI.MISS_COLOR);
+					break;
+			case 2: cell.setColor(GUI.SHIP_COLOR);
+					break;
+			case 3: cell.setColor(GUI.HIT_COLOR);
+					break;
+			case 4: cell.setColor(GUI.SUNK_COLOR);
+					break;
+		}
+	}
 
-        return new Coordinate(column, row);
-    }
+	/**Translate a pixel position into a logical coordinate on this grid. Used
+	 * for translating mouse event positions.
+	 *
+	 * @param p the pixel coordinates to translate
+	 *
+	 * @return the logical coordinates corresponding to the pixel position
+	 */
+	public Coordinate translatePosition(Point p) {
+		int column = p.x / cellWidth;
+		if(column >= columnCount)
+			column = columnCount-1;
 
-    @Override
-    public Dimension getPreferredSize() {
-        return new Dimension(300, 300);
-    }
+		int row = p.y / cellHeight;
+		if(row >= rowCount)
+			row = rowCount-1;
 
-    @Override
-    public void invalidate() {
-        gridInvalid = true;
-        selectedCell = null;
-        super.invalidate();
-    }
+		return new Coordinate(column, row);
+	}
 
-    @Override
-    protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
-        Graphics2D g2d = (Graphics2D)g.create();
+	@Override
+	public Dimension getPreferredSize() {
+		return new Dimension(300, 300);
+	}
 
-        if(gridInvalid) {
-            resizeCells();
-            gridInvalid = false;
-        }
+	@Override
+	public void invalidate() {
+		gridInvalid = true;
+		selectedCell = null;
+		super.invalidate();
+	}
 
-        for(Cell cell : cells) {
-            g2d.setColor(cell.getColor());
-            g2d.fill(cell);
-        }
+	@Override
+	protected void paintComponent(Graphics g) {
+		super.paintComponent(g);
+		Graphics2D g2d = (Graphics2D)g.create();
 
-        if(selectedCell != null) {
-            Cell cell = getCell(selectedCell);
-            g2d.setColor(SELECTED_MASK);
-            g2d.fill(cell);
-        }
+		if(gridInvalid) {
+			resizeCells();
+			gridInvalid = false;
+		}
 
-        g2d.setColor(Color.GRAY);
-        for(Cell cell : cells) 
-            g2d.draw(cell);
+		for(Cell cell : cells) {
+			g2d.setColor(cell.getColor());
+			g2d.fill(cell);
+		}
 
-        g2d.dispose();
-    }
+		if(selectedCell != null) {
+			Cell cell = getCell(selectedCell);
+			g2d.setColor(SELECTED_MASK);
+			g2d.fill(cell);
+		}
 
-    private void resizeCells() {
-        int width = getWidth();
-        int height = getHeight();
+		g2d.setColor(Color.GRAY);
+		for(Cell cell : cells) 
+			g2d.draw(cell);
 
-        cellWidth = width / columnCount;
-        cellHeight = height / rowCount;
+		g2d.dispose();
+	}
 
-        int xOffset = (width - (columnCount * cellWidth)) / 2;
-        int yOffset = (height - (rowCount * cellHeight)) / 2;
+	private void resizeCells() {
+		int width = getWidth();
+		int height = getHeight();
 
-        for(int row = 0; row < rowCount; row++) {
-            for(int col = 0; col < columnCount; col++) {
-                cells.get(col + row*columnCount).setBounds(
-                    xOffset + (col * cellWidth),
-                    yOffset + (row * cellHeight),
-                    cellWidth,
-                    cellHeight
-                );
-            }
-        }
-    }
+		cellWidth = width / columnCount;
+		cellHeight = height / rowCount;
+
+		int xOffset = (width - (columnCount * cellWidth)) / 2;
+		int yOffset = (height - (rowCount * cellHeight)) / 2;
+
+		for(int row = 0; row < rowCount; row++) {
+			for(int col = 0; col < columnCount; col++) {
+				cells.get(col + row*columnCount).setBounds(
+						xOffset + (col * cellWidth),
+						yOffset + (row * cellHeight),
+						cellWidth,
+						cellHeight
+						);
+			}
+		}
+	}
 }
 
