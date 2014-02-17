@@ -30,7 +30,7 @@ public class Grid extends JPanel implements Observer {
     private boolean gridInvalid;
     private final Color SELECTED_MASK = new Color(255, 255, 255, 50);
 
-    public Grid(int rows, int columns) {
+    public Grid(int rows, int columns, boolean active) {
         rowCount = rows;
         columnCount = columns;
         cells = new ArrayList<>(columnCount * rowCount);
@@ -40,40 +40,29 @@ public class Grid extends JPanel implements Observer {
 
         gridInvalid = true;
         selectedCell = null;
-    }
 
-    public Grid(int rows, int columns, final Controller controller) {
-        this(rows, columns);
-
-        MouseAdapter mouseListener = new MouseAdapter() {
-            @Override
-            public void mouseMoved(MouseEvent e) {
-                selectedCell = translatePosition(e.getPoint());
-                repaint();
-            }
-
-            @Override
-            public void mouseExited(MouseEvent e) {
-                selectedCell = null;
-                repaint();
-            }
-
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                if(selectedCell != null) {
-                    //JOptionPane.showMessageDialog(
-                    //    getTopLevelAncestor(),
-                    //    "Cell (" + selectedCell.x + ", " +
-                    //    selectedCell.y + ") clicked."
-                    //);
-                    controller.shoot(selectedCell);
+        if(active) {
+            MouseAdapter mouseListener = new MouseAdapter() {
+                @Override
+                public void mouseMoved(MouseEvent e) {
+                    selectedCell = translatePosition(e.getPoint());
+                    repaint();
                 }
-            }
-        };
 
-        addMouseListener(mouseListener);
-        addMouseMotionListener(mouseListener);
+                @Override
+                public void mouseExited(MouseEvent e) {
+                    selectedCell = null;
+                    repaint();
+                }
+            };
+
+            addMouseMotionListener(mouseListener);
+            addMouseListener(mouseListener);
+        }
     }
+
+    public boolean hasSelection() {return selectedCell != null;}
+    public Coordinate getSelectedCell() {return selectedCell;}
 
     public void update(Observable o, Object arg) {
         int[] message = (int[])arg;
