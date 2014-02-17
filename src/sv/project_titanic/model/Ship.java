@@ -71,10 +71,6 @@ public class Ship
 		}
 		return false;
 	}
-
-	public ArrayList<Coordinate> getCoordinates() {
-		return coords;
-	}
 }
 
 

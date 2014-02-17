@@ -118,7 +118,7 @@ public class Controller {
 	 * @return 		true if able to place ship, otherwise false.
 	 */
 	public boolean canPlaceShip(Ship s){
-		Iterator<Coordinate> itr = s.getCoordinates().iterator();
+		Iterator<Coordinate> itr = s.getCoords().iterator();
 		
 		while(itr.hasNext()){
 			Coordinate currentCoord = itr.next();
@@ -147,7 +147,7 @@ public class Controller {
 	 * 				    has a ship placed on that coordinate.
 	 */	
 	public void placeShip(Ship s){
-		Iterator<Coordinate> itr = s.getCoordinates().iterator();
+		Iterator<Coordinate> itr = s.getCoords().iterator();
 
 		while(itr.hasNext()){
 			Coordinate newCoord = itr.next();
