@@ -19,12 +19,17 @@ public class Board extends Observable {
 		fieldStatus = new int[boardX][boardY];
 	}
 	
-	public void addShip(Ship ship) {
-		fleet.add(ship);
-
-		for(Coordinate c : ship.getCoords()) {
-			setFieldStatus(c.getX(), c.getY(), 2);
+		for(int i=0 ; i < boardX ; i++){
+			for(int j=0 ; j < boardY; j++){
+				fieldStatus[i][j] = 0;
+			}
 		}
+		
+	}
+	
+	public void addShip(Ship ship)
+	{
+		fleet.add(ship);
 	}
 	
 	public void setFieldStatus(int x, int y, int status) {

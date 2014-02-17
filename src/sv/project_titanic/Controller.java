@@ -118,25 +118,25 @@ public class Controller {
 	 * @return 		true if able to place ship, otherwise false.
 	 */
 	public boolean canPlaceShip(Ship s){
-		
-		Iterator<Coordinate> itr = coord.iterator();
+		Iterator<Coordinate> itr = s.getCoordinates().iterator();
 		
 		while(itr.hasNext()){
 			Coordinate currentCoord = itr.next();
-			
+
 			int x = currentCoord.getX();
 			int y = currentCoord.getY();
-			
-			//Om det redan finns en båt på denna koordinat.
-			if(currentBoard.getFieldStatus(x,y) != 0){
-				return false;
-			} 
 
 			// Är vi utanför spelbrädan?
-			if(x >= currentBoard.getYdim() || y >= currentBoard.getXdim()){
+			if(x >= homeBoard.getYdim() || y >= homeBoard.getXdim()){
+				return false;
+			}
+
+			//Om det redan finns en båt på denna koordinat.
+			if(homeBoard.getFieldStatus(x,y) != 0){
 				return false;
 			}
 		}
+
 		return true;
 	}
 	
@@ -147,23 +147,23 @@ public class Controller {
 	 * 				    has a ship placed on that coordinate.
 	 */	
 	public void placeShip(Ship s){
-			Iterator<Coordinate> itr = coord.iterator();
-			
-			while(itr.hasNext()){
-				Coordinate newCoord = itr.next();
-				
-				int x = newCoord.getX();
-				int y = newCoord.getY();
-				
-				int status = currentBoard.getFieldStatus(x,y);
-				
-				if( status == 2){
+		Iterator<Coordinate> itr = s.getCoordinates().iterator();
 
-				} else {
-					currentBoard.setFieldStatus(x,y,status);
-				}
-				//ship.add(s);
+		while(itr.hasNext()){
+			Coordinate newCoord = itr.next();
+
+			int x = newCoord.getX();
+			int y = newCoord.getY();
+
+			int status = homeBoard.getFieldStatus(x,y);
+
+			if( status == 2){
+
+			} else {
+				homeBoard.setFieldStatus(x,y,2);
 			}
+			homeBoard.addShip(s);
+		}
 	}
 }
 
