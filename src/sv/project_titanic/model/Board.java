@@ -6,32 +6,23 @@ import java.util.Observable;
 import sv.project_titanic.model.Ship;
 
 public class Board extends Observable {
-	private int boardX;
-	private int boardY;
+	private int width;
+	private int height;
 	private ArrayList<Ship> fleet;
 	public int[][] fieldStatus;
-	
-	public Board(int xdim, int ydim) {
-		this.boardX = xdim;
-		this.boardY = ydim;
+
+	public Board(int width, int height) {
+		this.width = width;
+		this.height = height;
 		
 		fleet = new ArrayList<Ship>();
-		fieldStatus = new int[boardX][boardY];
+		fieldStatus = new int[width][height];
 	}
-	
-		for(int i=0 ; i < boardX ; i++){
-			for(int j=0 ; j < boardY; j++){
-				fieldStatus[i][j] = 0;
-			}
-		}
-		
-	}
-	
-	public void addShip(Ship ship)
-	{
+
+	public void addShip(Ship ship) {
 		fleet.add(ship);
 	}
-	
+
 	public void setFieldStatus(int x, int y, int status) {
 		fieldStatus[x][y] = status;
 		setChanged();
@@ -40,11 +31,11 @@ public class Board extends Observable {
 	}
 	
 	public int getXdim() {
-		return boardX;
+		return width;
 	}
 	
 	public int getYdim() {
-		return boardY;
+		return height;
 	}
 	
 	public int getFieldStatus(int x, int y) {
