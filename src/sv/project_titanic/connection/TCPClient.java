@@ -1,6 +1,6 @@
 /**
  * @author Filip
- * @version 1.0.1
+ * @version 1.0.2
  */
 
 package sv.project_titanic.connection;
@@ -71,15 +71,7 @@ public class TCPClient
 			}
 		});
 
-		try {
-			//wait for one second just in case the server hasn't started yet.
-			runner.wait(1000);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 		runner.start();
-	
 		return true;
 	}
 	
