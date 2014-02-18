@@ -5,11 +5,11 @@ import java.awt.event.ActionEvent;
 public class ClientActionEvent extends ActionEvent {
 
 	Object recieveObject;
-	public ClientActionEvent(Object recieveObject ,Object arg0, int arg1, String arg2)
+	public ClientActionEvent(Object source, Object recieveObject, int id, String command)
 	{
-		super(arg0, arg1, arg2);
+		super(source, id, command);
 		this.recieveObject = recieveObject;
 	}
 	
 	Object getRecieveObject() { return recieveObject; }
-}
+}	

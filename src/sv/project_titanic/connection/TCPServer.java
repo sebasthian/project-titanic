@@ -1,6 +1,6 @@
 /**
  * @author Filip Lindeby
- * @version 0.0.1
+ * @version 0.1.0
  *
  */
 
@@ -8,11 +8,19 @@ package sv.project_titanic.connection;
 import java.io.*;
 import java.net.*;
 
-
 public class TCPServer implements Runnable
 {
 	
-	//private Thread runner;
+	//TODO små arrayer.
+	private Thread client1Runner;
+	private Thread client2Runner;
+	ObjectOutputStream toClient1;
+	ObjectOutputStream toClient2;
+	ObjectInputStream fromClient1;
+	ObjectInputStream fromClient2;
+	Socket clientSocket1;
+	Socket clientSocket2;
+	
 	private ServerSocket serverSocket;
 	private int port;
 	
@@ -59,54 +67,63 @@ public class TCPServer implements Runnable
 	private void onAccepted()
 	{
 		try {
+			clientSocket1 = serverSocket.accept();
+			toClient1 = new ObjectOutputStream(clientSocket1.getOutputStream());
+			fromClient1 = new ObjectInputStream(clientSocket1.getInputStream());
+			toClient1.writeObject("Connected to server: you are client 1 :)");
 			
-			Socket clientSocket1 = serverSocket.accept();
-			ObjectOutputStream toClient1 = new ObjectOutputStream(clientSocket1.getOutputStream());
-			ObjectInputStream fromClient1 = new ObjectInputStream(clientSocket1.getInputStream());
-			//toClient1.writeByte(ConnectionMessages.CLIENT_CONNECTED);
-			
-			//Socket clientSocket2 = serverSocket.accept();
-            //DataOutputStream toClient2 = new DataOutputStream(clientSocket2.getOutputStream());
-            //BufferedReader fromClient2 = new BufferedReader(new InputStreamReader(clientSocket1.getInputStream()));
-			//toClient2.writeByte(ConnectionMessages.CLIENT_CONNECTED);
-			
-		
+			clientSocket2 = serverSocket.accept();
+	        toClient2 = new ObjectOutputStream(clientSocket2.getOutputStream());
+	        fromClient2 = new ObjectInputStream(clientSocket2.getInputStream());
+	        
+	        
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 
-			while(!serverSocket.isClosed())
-			{
-				
-				Object obj = fromClient1.readObject();
-				if(obj instanceof String) {
-					System.out.println("Server: Client says '" + (String)obj + "'" );
-					toClient1.writeObject("MESSAGE BACK TO YOU :) : " + obj);
+
+		client1Runner = new Thread(new Runnable(){
+			public void run() {
+				while(!serverSocket.isClosed() && clientSocket1.isConnected() && clientSocket2.isConnected()) {
+					try {
+						Object obj = fromClient1.readObject();
+						toClient2.writeObject(obj);
+					} catch (ClassNotFoundException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					
 				}
 				
-				
-				//int ch = -1;
-				//while(clientSocket1.getInputStream().read() != -1)
-				//{
-				//	System.out.println("client 1: " + ch);
-				//}
-				
-				/*while(clientSocket2.getInputStream().read() != -1)
-				{
-					System.out.println("client 2: " + ch);
-				}*/
-				
-				//serverSocket.close();
 			}
 			
+		});
+		
+		client2Runner = new Thread(new Runnable(){
+			public void run() {
+				while(!serverSocket.isClosed() && clientSocket1.isConnected() && clientSocket2.isConnected()) {
+					try {
+						Object obj = fromClient2.readObject();
+						toClient1.writeObject(obj);
+					} catch (ClassNotFoundException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					
+				}
+			}
 			
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		
-		
+		});
+		client1Runner.start();
+		client2Runner.start();
+	
 	}
 	
 }

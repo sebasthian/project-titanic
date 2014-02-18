@@ -7,7 +7,8 @@ import java.net.UnknownHostException;
 
 public class TcpTestClass implements ActionListener {
 
-	TCPClient client;	
+	TCPClient client1;
+	TCPClient client2;
 	Thread serverThread;
 	
 	
@@ -15,13 +16,26 @@ public class TcpTestClass implements ActionListener {
 		serverThread = new Thread(new TCPServer(6665), "server thread");
 		serverThread.start();
 
-		client = new TCPClient();
-		client.connect("localhost");
-		client.send("[MESSAGE]");
+		client1 = new TCPClient();
+		client1.addActionListener(this);
+		client1.connect("localhost");
+		client1.send("Hi I'm Client1 :)");
+		
+		
+		System.out.println("server running...");
+		client2 = new TCPClient();
+		client2.addActionListener(this);
+		client2.connect("localhost");
+		client2.send("Hi I'm Client2 :)");
 	}
 	
 	@Override
-	public void actionPerformed(ActionEvent arg0) {
+	public void actionPerformed(ActionEvent e) {
+		ClientActionEvent ce = (ClientActionEvent)e;
+		if(ce.getRecieveObject() instanceof String) {
+			System.out.println("ActionPerfomed: " + (String)ce.getRecieveObject());
+		}
+		
 
 	}
 
