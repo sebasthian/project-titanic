@@ -1,8 +1,7 @@
 /**
  * @author Filip
- * @version 0.1.0
+ * @version 1.0.1
  */
-
 
 package sv.project_titanic.connection;
 
@@ -26,34 +25,33 @@ public class TCPClient
 		try {
 			clientSocket.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 	
 	/**
-	 * Connect to a relay-server.
+	 * Connect to the "relay-server".
+	 * This Function should only be called if there is a running server.
 	 * @param ip
-	 * @throws UnknownHostException
-	 * @throws IOException
+	 * @return boolean
 	 */
-	public void connect(String ip) 
+	public boolean connect(String ip) 
 	{
 		try {
 			clientSocket = new Socket("localhost", 6665);
 			toServer = new ObjectOutputStream(clientSocket.getOutputStream());
 			fromServer = new ObjectInputStream(clientSocket.getInputStream());
 		} catch (UnknownHostException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-			return;
+			
+			//e1.printStackTrace();
+			return false;
 		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-			return;
+			//e1.printStackTrace();
+			return false;
 		}
 
 		
+		//This runner thread recieves all objects from the server and notifies all observers.
 		runner = new Thread(new Runnable(){
 			public void run() {
 				while(clientSocket.isConnected()) {
@@ -74,31 +72,37 @@ public class TCPClient
 		});
 
 		try {
-			runner.sleep(1000);
+			//wait for one second just in case the server hasn't started yet.
+			runner.wait(1000);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		runner.start();
+	
+		return true;
 	}
 	
 	
 	/**
-	 * Sends a Java Object to the reciever. This object can be anything.
+	 * Sends a Java Object to the reciever. This object could be anything.
 	 * i.e [String, int, char, Custom Object]
 	 * @param obj
+	 * @return boolean
 	 */
-	public void send(Object obj)
+	public boolean send(Object obj)
 	{
-		if(clientSocket != null)
-			if(clientSocket.isConnected()) {
-				try {
-					toServer.writeObject(obj);
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
+		if(clientSocket == null) { return false; }
+		if(!clientSocket.isConnected()) {return false;}
+		
+		try {
+			toServer.writeObject(obj);
+		} catch (IOException e) {
+			//e.printStackTrace();
+			return false;
+		}
+		return true;
+		
 	}
 	
 	/**

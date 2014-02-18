@@ -1,6 +1,6 @@
 /**
  * @author Filip Lindeby
- * @version 0.1.0
+ * @version 1.0.1
  *
  */
 
@@ -82,7 +82,9 @@ public class TCPServer implements Runnable
 			e1.printStackTrace();
 		}
 
+		
 
+		//This runner thread relays objects sent from client1 to client2.
 		client1Runner = new Thread(new Runnable(){
 			public void run() {
 				while(!serverSocket.isClosed() && clientSocket1.isConnected() && clientSocket2.isConnected()) {
@@ -90,10 +92,8 @@ public class TCPServer implements Runnable
 						Object obj = fromClient1.readObject();
 						toClient2.writeObject(obj);
 					} catch (ClassNotFoundException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					} catch (IOException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 					
@@ -103,6 +103,8 @@ public class TCPServer implements Runnable
 			
 		});
 		
+		
+		//This runner thread relays objects sent from client2 to client1.
 		client2Runner = new Thread(new Runnable(){
 			public void run() {
 				while(!serverSocket.isClosed() && clientSocket1.isConnected() && clientSocket2.isConnected()) {
@@ -110,10 +112,8 @@ public class TCPServer implements Runnable
 						Object obj = fromClient2.readObject();
 						toClient1.writeObject(obj);
 					} catch (ClassNotFoundException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					} catch (IOException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 					
