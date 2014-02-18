@@ -5,24 +5,30 @@ import java.util.Iterator;
 
 public class Ship 
 {
-	private static ArrayList<Coordinate> coords;
+	private ArrayList<Coordinate> coords;
+	private ArrayList<Coordinate> live_coords;
 
-	
 	public Ship(ArrayList<Coordinate> inputCoords){
 		coords = new ArrayList<Coordinate>();
+		live_coords = new ArrayList<Coordinate>();
+		
 		addShip(inputCoords);
+		
 	}
 	
 	/**
 	 * Private method to add coords to arrayList.
 	 */
+	
 	private void addShip(ArrayList<Coordinate> inputCoords)
 	{
 		for(Coordinate inputCoord : inputCoords)
 		{
 			coords.add(inputCoord);
+			live_coords.add(inputCoord);
 		}
 	}
+
 	public ArrayList<Coordinate> getCoords(){
 		return coords;
 	}
@@ -34,7 +40,7 @@ public class Ship
 	 */
 	public void shipHit(Coordinate coord)
 	{
-		Iterator<Coordinate> it = coords.iterator();
+		Iterator<Coordinate> it = live_coords.iterator();
 		
 		while(it.hasNext()){
 			Coordinate shipCoord = it.next();
@@ -52,7 +58,7 @@ public class Ship
 	 */
 	public boolean noMoreShip()
 	{
-		if(coords.isEmpty()){
+		if(live_coords.isEmpty()){
 			return true;
 		}
 		return false;
@@ -64,16 +70,13 @@ public class Ship
 	 */
 	public boolean hasCoordinate(Coordinate coord)
 	{
-		for(Coordinate shipCoord : coords){
+		for(Coordinate shipCoord : live_coords){
 			if(shipCoord.equals(coord)){
 				return true;
 			}
 		}
 		return false;
 	}
-
-
-
 }
 
 
