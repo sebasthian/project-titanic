@@ -10,6 +10,7 @@ public class Ship
 	
 	public Ship(ArrayList<Coordinate> inputCoords){
 		coords = new ArrayList<Coordinate>();
+		live_coords = new ArrayList<Coordinate>();
 		addShip(inputCoords);
 	}
 	
@@ -53,7 +54,7 @@ public class Ship
 	 */
 	public boolean noMoreShip()
 	{
-		if(coords.isEmpty()){
+		if(live_coords.isEmpty()){
 			return true;
 		}
 		return false;
