@@ -5,8 +5,8 @@ import java.util.Iterator;
 
 public class Ship 
 {
-	private static ArrayList<Coordinate> coords;
-
+	private ArrayList<Coordinate> coords;
+	private ArrayList<Coordinate> live_coords;
 	
 	public Ship(ArrayList<Coordinate> inputCoords){
 		coords = new ArrayList<Coordinate>();
@@ -21,6 +21,7 @@ public class Ship
 		for(Coordinate inputCoord : inputCoords)
 		{
 			coords.add(inputCoord);
+			live_coords.add(inputCoord);
 		}
 	}
 	public ArrayList<Coordinate> getCoords(){
@@ -34,7 +35,7 @@ public class Ship
 	 */
 	public void shipHit(Coordinate coord)
 	{
-		Iterator<Coordinate> it = coords.iterator();
+		Iterator<Coordinate> it = live_coords.iterator();
 		
 		while(it.hasNext()){
 			Coordinate shipCoord = it.next();
@@ -64,7 +65,7 @@ public class Ship
 	 */
 	public boolean hasCoordinate(Coordinate coord)
 	{
-		for(Coordinate shipCoord : coords){
+		for(Coordinate shipCoord : live_coords){
 			if(shipCoord.equals(coord)){
 				return true;
 			}
@@ -72,5 +73,4 @@ public class Ship
 		return false;
 	}
 }
-
 

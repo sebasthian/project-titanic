@@ -35,16 +35,15 @@ public class Controller {
 		
 		//int result = 0;
 		
+		
 		if(playerTurn){
-			
 			currentBoard = awayBoard;
-			
 			if(canPlaceShot(c)){
 				placeShot(c);		
 			}
 		}
 		if(isGameOver()){
-
+			exitGame();
 		}
 	}
 	/**
@@ -69,7 +68,7 @@ public class Controller {
 	 * @param c   object containing coordinate.
 	 * @return 
 	 */
-	public int placeShot(Coordinate c){
+	public void placeShot(Coordinate c){
 		
 		int x = c.getX();
 		int y = c.getY();
@@ -78,25 +77,30 @@ public class Controller {
 			
 		if(status == 1 || status == 3){
 			//Redan beskjuten ruta.
-			return -1;
+
 		}else if(status == 0){
-			status++;
-			currentBoard.setFieldStatus(x,y,status);
-			
-			return status;
+
+			currentBoard.setFieldStatus(x,y,1);
+
 		} else{
 			for(Ship ship : currentBoard.getFleet()){
 				if(ship.hasCoordinate(c)){
 					ship.shipHit(c);
+					
+					if(ship.noMoreShip()){
+						for(Coordinate cc : ship.getCoords()){
+							currentBoard.setFieldStatus(cc.getX(), cc.getY(), 4);
+						}
+					}else{
+						currentBoard.setFieldStatus(x,y,3);
+					}
 					break;
 				}
 			}
-			currentBoard.setFieldStatus(x,y,status+1);
 		}
 		
-		currentBoard.setFieldStatus(x,y,status+1);
-			
-		return status+1;
+		//currentBoard.setFieldStatus(x,y,status+1);
+
 		
 	}
 	/**
@@ -105,13 +109,27 @@ public class Controller {
 	 * @return 		true if fleet is empty, otherwise false.
 	 */
 	public boolean isGameOver(){
-		for(Ship ship : currentBoard.getFleet()){
+		for(Ship ship : awayBoard.getFleet()){
 			if(!ship.noMoreShip()){
 				return false;				
 			}
 		}
 		return true;
 	}
+	/**
+	 * Checks if the players wants to play another run.
+	 * @return		true if another run shall me played.
+	 */
+	public boolean replay(){
+		return false;
+	}
+	/**
+	 * Kills the game.
+	 */
+	public void exitGame(){
+		System.exit(0);
+	}
+	
 	/**
 	 * Check if the ship can be placed on the board.
 	 * @param s 	object of a ship.
@@ -161,9 +179,13 @@ public class Controller {
 
 			} else {
 				homeBoard.setFieldStatus(x,y,2);
+				awayBoard.setFieldStatus(x,y,2);
 			}
-			homeBoard.addShip(s);
+			
+			
 		}
+		awayBoard.addShip(s);
+		homeBoard.addShip(s);
 	}
 }
 
