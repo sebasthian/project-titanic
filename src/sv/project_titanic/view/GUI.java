@@ -104,6 +104,9 @@ public class GUI extends JFrame implements Runnable {
 
 		setLayout(new CardLayout());
 
+		JPanel menuCard = buildMenuCard();
+		add(menuCard);
+
 		JPanel shipInitCard = buildShipInitCard();
 		add(shipInitCard);
 
@@ -114,6 +117,46 @@ public class GUI extends JFrame implements Runnable {
 		setLocationRelativeTo(null);
 		setVisible(true);
 	}
+
+	private JPanel buildMenuCard() {
+		JPanel menuCard = new JPanel(new GridBagLayout());
+
+		JPanel buttonPanel = new JPanel(new GridLayout(0, 1));
+		buttonPanel.setPreferredSize(new Dimension(100, 150));
+
+		JButton hostGameButton = new JButton("Host Game");
+		hostGameButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				//controller.hostGame();
+				CardLayout layout = (CardLayout)getContentPane().getLayout();
+				layout.next(getContentPane());
+			}
+		});
+		buttonPanel.add(hostGameButton);
+
+		JButton joinGameButton = new JButton("Join Game");
+		joinGameButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String host = JOptionPane.showInputDialog("Enter IP Address of Host:");
+				//controller.joinGame(host);
+				
+				CardLayout layout = (CardLayout)getContentPane().getLayout();
+				layout.next(getContentPane());
+			}
+		});
+		buttonPanel.add(joinGameButton);
+
+		JButton exitButton = new JButton("Exit");
+		exitButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				System.exit(0);
+			}
+		});
+		buttonPanel.add(exitButton);
+
+		return buttonPanel;
+	}
+
 
 	private JPanel buildShipInitCard() {
 		JPanel shipInitCard = new JPanel(new BorderLayout());
