@@ -10,8 +10,6 @@ import java.net.*;
 
 public class TCPServer implements Runnable
 {
-	
-	//TODO små arrayer.
 	private Thread client1Runner;
 	private Thread client2Runner;
 	ObjectOutputStream toClient1;
@@ -75,6 +73,7 @@ public class TCPServer implements Runnable
 			clientSocket2 = serverSocket.accept();
 	        toClient2 = new ObjectOutputStream(clientSocket2.getOutputStream());
 	        fromClient2 = new ObjectInputStream(clientSocket2.getInputStream());
+			toClient2.writeObject("Connected to server: you are client 2 :)");
 	        
 	        
 		} catch (IOException e1) {

@@ -15,5 +15,5 @@ public class ClientActionEvent extends ActionEvent {
 		this.recieveObject = recieveObject;
 	}
 	
-	Object getRecieveObject() { return recieveObject; }
+	public Object getRecieveObject() { return recieveObject; }
 }	

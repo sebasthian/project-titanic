@@ -1,11 +1,13 @@
 package sv.project_titanic;
 
 import sv.project_titanic.model.*;
+import sv.project_titanic.connection.*;
 
 
 import java.util.ArrayList;
 import java.util.Iterator;
-
+import java.awt.*;
+import java.awt.event.*;
 
 
 public class Controller {
@@ -16,6 +18,9 @@ public class Controller {
 	private boolean playerTurn;
 	private Ship ship;
 	private ArrayList<Coordinate> coord;
+	private Thread serverThread;
+	private TCPServer server;
+	private TCPClient client;
 	
 	
   /**
@@ -24,8 +29,55 @@ public class Controller {
 	public Controller(Board ab, Board hb, boolean turn){
 		awayBoard = ab;
 		homeBoard = hb;
-		playerTurn = turn;
+		playerTurn = false;
+
+		client = new TCPClient();
+
+		client.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				ClientActionEvent c = (ClientActionEvent)e;
+
+				Object message = c.getRecieveObject();
+
+				if(message instanceof Board)
+					initializeAwayBoard((Board)message);
+				else if(message instanceof int[])
+					opponentsMove((int[])message);
+				else if(message instanceof String)
+					System.out.println((String)message);
+			}
+		});
 	}
+
+	public void startGame() {
+		client.send(homeBoard);
+	}
+
+	public void initializeAwayBoard(Board board) {
+		awayBoard.copyBoard(board);
+	}
+
+	public void opponentsMove(int[] move) {
+		homeBoard.setFieldStatus(move[0], move[1], move[2]);
+
+		playerTurn = true;
+	}
+
+	public boolean hostGame() {
+		server = new TCPServer(6665);
+		serverThread = new Thread(server);
+		
+		serverThread.start();
+
+		playerTurn = true;
+
+		return joinGame("127.0.0.1");
+	}
+
+	public boolean joinGame(String ip) {
+		return client.connect(ip);
+	}
+
 	/**
 	 * Tries to shoot at a given coordinate.
 	 * @param x  	x-coordinate from event.
@@ -39,10 +91,12 @@ public class Controller {
 		if(playerTurn){
 			currentBoard = awayBoard;
 			if(canPlaceShot(c)){
-				placeShot(c);		
+				placeShot(c);
+				playerTurn = false;
 			}
 		}
 		if(isGameOver()){
+			System.out.println("GAME OVER");
 			exitGame();
 		}
 	}
@@ -81,6 +135,8 @@ public class Controller {
 		}else if(status == 0){
 
 			currentBoard.setFieldStatus(x,y,1);
+			int[] message = {x, y, 1};
+			client.send(message);
 
 		} else{
 			for(Ship ship : currentBoard.getFleet()){
@@ -90,9 +146,13 @@ public class Controller {
 					if(ship.noMoreShip()){
 						for(Coordinate cc : ship.getCoords()){
 							currentBoard.setFieldStatus(cc.getX(), cc.getY(), 4);
+							int[] message = {cc.getX(), cc.getY(), 4};
+							client.send(message);
 						}
 					}else{
 						currentBoard.setFieldStatus(x,y,3);
+						int[] message = {x, y, 3};
+						client.send(message);
 					}
 					break;
 				}
@@ -179,12 +239,9 @@ public class Controller {
 
 			} else {
 				homeBoard.setFieldStatus(x,y,2);
-				awayBoard.setFieldStatus(x,y,2);
 			}
 			
-			
 		}
-		awayBoard.addShip(s);
 		homeBoard.addShip(s);
 	}
 }
