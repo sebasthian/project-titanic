@@ -4,13 +4,16 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 public class Ship {
-	private static ArrayList<Coordinate> coords;
+	private ArrayList<Coordinate> coords;
+	private ArrayList<Coordinate> live_coords;
 	
 	public Ship(ArrayList<Coordinate> coords){
 		this.coords = new ArrayList<>();
 
-		for(Coordinate c : coords)
+		for(Coordinate c : coords) {
 			this.coords.add(c);
+			live_coords.add(s);
+		}
 	}
 
 	public ArrayList<Coordinate> getCoords() {
@@ -22,7 +25,7 @@ public class Ship {
 	 * Returns nothing but removes the corresponding Coordinate object if hit.
 	 */
 	public void shipHit(Coordinate coord) {
-		coords.remove(coord);
+		live_coords.remove(coord);
 	}
 	
 	/**
@@ -30,7 +33,7 @@ public class Ship {
 	 * @return True if no Coordinate objects exist in coords.
 	 */
 	public boolean noMoreShip() {
-		return coords.isEmpty();
+		return live_coords.isEmpty();
 	}
 	
 	/**
@@ -38,7 +41,7 @@ public class Ship {
 	 * @return True if the ship contains the coordinate.
 	 */
 	public boolean hasCoordinate(Coordinate coord) {
-		return coords.contains(coord);
+		return live_coords.contains(coord);
 	}
 }
 

@@ -180,6 +180,7 @@ public class GUI extends JFrame implements Runnable {
 					initDoneButton.setEnabled(true);
 
 				shipPreview.setText(getPreviewText());
+				repaint();
 			}
 		});
 
@@ -240,6 +241,7 @@ public class GUI extends JFrame implements Runnable {
 			public void mouseClicked(MouseEvent e) {
 				if(awayGrid.hasSelection()) {
 					controller.shoot(awayGrid.getSelectedCell());
+					repaint();
 				}
 			}
 		});
