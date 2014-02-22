@@ -1,9 +1,10 @@
 package sv.project_titanic.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-public class Ship {
+public class Ship implements Serializable {
 	private ArrayList<Coordinate> coords;
 	private ArrayList<Coordinate> live_coords;
 	

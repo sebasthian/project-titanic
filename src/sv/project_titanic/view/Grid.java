@@ -114,6 +114,8 @@ public class Grid extends JPanel implements Observer {
 		Cell cell = getCell(row, column);
 
 		cell.setColor(GUI.COLOR_MAP.get(status));
+
+		repaint();
 	}
 
 	/**Translate a pixel position into a logical coordinate on this grid. Used

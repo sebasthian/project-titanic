@@ -38,7 +38,7 @@ public class TCPClient
 	public boolean connect(String ip) 
 	{
 		try {
-			clientSocket = new Socket("localhost", 6665);
+			clientSocket = new Socket(ip, 6665);
 			toServer = new ObjectOutputStream(clientSocket.getOutputStream());
 			fromServer = new ObjectInputStream(clientSocket.getInputStream());
 		} catch (UnknownHostException e1) {

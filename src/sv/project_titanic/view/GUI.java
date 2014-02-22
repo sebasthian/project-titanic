@@ -126,7 +126,7 @@ public class GUI extends JFrame implements Runnable {
 		JButton hostGameButton = new JButton("Host Game");
 		hostGameButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				//controller.hostGame();
+				controller.hostGame();
 				CardLayout layout = (CardLayout)getContentPane().getLayout();
 				layout.next(getContentPane());
 			}
@@ -137,7 +137,7 @@ public class GUI extends JFrame implements Runnable {
 		joinGameButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				String host = JOptionPane.showInputDialog("Enter IP Address of Host:");
-				//controller.joinGame(host);
+				controller.joinGame(host);
 				
 				CardLayout layout = (CardLayout)getContentPane().getLayout();
 				layout.next(getContentPane());
@@ -205,6 +205,8 @@ public class GUI extends JFrame implements Runnable {
 		initDoneButton.setEnabled(false);
 		initDoneButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				controller.startGame();
+
 				CardLayout layout = (CardLayout)getContentPane().getLayout();
 				layout.next(getContentPane());
 			}
