@@ -15,7 +15,7 @@ public class Board extends Observable {
 		this.width = width;
 		this.height = height;
 		
-		fleet = new ArrayList<Ship>();
+		fleet = new ArrayList<>();
 		fieldStatus = new int[width][height];
 	}
 
@@ -44,6 +44,15 @@ public class Board extends Observable {
 
 	public ArrayList<Ship> getFleet() {
 		return fleet;
+	}
+
+	public Ship getShipByCoord(Coordinate coord) {
+		for(Ship ship : fleet) {
+			if(ship.hasCoordinate(coord))
+				return ship;
+		}
+
+		return null;
 	}
 }
 

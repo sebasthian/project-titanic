@@ -7,16 +7,10 @@ public class Player {
 		this.name = name;
 	}
 
-	/*
-	 * Sets playername
-	 */
-	public void setName(String s) {
-		name = s;
+	public void setName(String name) {
+		this.name = name;
 	}
 
-	/*
-	 * Return playername.
-	 */
 	public String getName() {
 		return name;
 	}

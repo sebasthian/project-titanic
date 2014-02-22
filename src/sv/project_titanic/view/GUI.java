@@ -53,8 +53,8 @@ public class GUI extends JFrame implements Runnable {
 		selectedShip = shipLengths.get(0);
 		orientation = "horizontal";
 
-		this.homePlayer = new JLabel(homePlayer.getPlayerName());
-		this.awayPlayer = new JLabel(awayPlayer.getPlayerName());
+		this.homePlayer = new JLabel(homePlayer.getName());
+		this.awayPlayer = new JLabel(awayPlayer.getName());
 		turnMessage = new JLabel("Your turn");
 	}
 
@@ -79,8 +79,7 @@ public class GUI extends JFrame implements Runnable {
 		if(selectedShip != -1 && shipInitGrid.hasSelection()) {
 			Ship ship = makeShip();
 
-			if(controller.canPlaceShip(ship)) {
-				controller.placeShip(ship);
+			if(controller.placeShip(ship)) {
 				shipLengths.remove(selectedShip);
 
 				if(shipLengths.size() == 0)

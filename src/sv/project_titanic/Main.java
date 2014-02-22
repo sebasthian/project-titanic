@@ -15,7 +15,7 @@ public class Main {
         Player homePlayer = new Player("player1");
         Player awayPlayer = new Player("player2");
 
-        Controller controller = new Controller(awayBoard, homeBoard, true);
+        Controller controller = new Controller(awayBoard, homeBoard);
 
         GUI gui = new GUI(homeBoard, awayBoard, homePlayer, awayPlayer, controller);
 
