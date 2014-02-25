@@ -118,5 +118,18 @@ public class Board extends Observable implements Serializable {
 
 		return null;
 	}
+
+	/**Check if all Ships have been sunk.
+	 *
+	 * @return true if all Ships are sunk, false otherwise.
+	 */
+	public boolean allShipsSunk() {
+		for(Ship ship : fleet) {
+			if(!ship.noMoreShip())
+				return false;
+		}
+
+		return true;
+	}
 }
 
