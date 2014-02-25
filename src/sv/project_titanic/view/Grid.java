@@ -177,6 +177,9 @@ public class Grid extends JPanel implements Observer {
 		g2d.dispose();
 	}
 
+	/**Resize the Cells of this Grid. Used if this Grid has become invalidated,
+	 * by resizing or similar.
+	 */
 	private void resizeCells() {
 		int width = getWidth();
 		int height = getHeight();

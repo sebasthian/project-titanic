@@ -3,7 +3,7 @@ package sv.project_titanic.view;
 import java.awt.Color;
 import java.awt.Rectangle;
 
-/**Representation of a cingle coordinate on the game board.*/
+/**Representation of a single coordinate on the game board.*/
 class Cell extends Rectangle {
 	private Color color;
 

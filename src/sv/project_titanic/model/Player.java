@@ -1,26 +1,24 @@
 package sv.project_titanic.model;
 
-public class Player
-{
-	private String playerName;
+/**Class for handling player data.*/
+public class Player {
+	private String name;
 	
-	
-	public Player(String name)
-	{
-		this.playerName = name;
-	}
-	/*
-	 * Sets playername
+	/**Create a new player.
+	 *
+	 * @param name the name of the Player.
 	 */
-	public void setPlayerName(String s)
-	{
-		playerName = s;
+	public Player(String name) {
+		this.name = name;
 	}
-	/*
-	 * Return playername.
-	 */
-	public String getPlayerName()
-	{
-		return playerName;
+
+	/**@param name a new name for this player.*/
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	/**@return the name of this player.*/
+	public String getName() {
+		return name;
 	}
 }

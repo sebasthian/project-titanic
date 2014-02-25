@@ -1,78 +1,52 @@
 package sv.project_titanic.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.io.Serializable;
 
-public class Ship implements Serializable
-{
+/**Representation of a ship on the board. Keeps track of what coordinates
+ * it is located at, and if those coordinates have been hit by the opponent.
+ */
+public class Ship implements Serializable {
 	private ArrayList<Coordinate> coords;
 	private ArrayList<Coordinate> live_coords;
-	
-	public Ship(ArrayList<Coordinate> inputCoords){
-		coords = new ArrayList<Coordinate>();
-		live_coords = new ArrayList<Coordinate>();
-		addShip(inputCoords);
-	}
-	
-	/**
-	 * Private method to add coords to arrayList.
+
+	/**Create a new ship.
+	 *
+	 * @param coords Where on the board this Ship is located.
 	 */
-	private void addShip(ArrayList<Coordinate> inputCoords)
-	{
-		for(Coordinate inputCoord : inputCoords)
-		{
-			coords.add(inputCoord);
-			live_coords.add(inputCoord);
-		}
+	public Ship(ArrayList<Coordinate> coords){
+		this.coords = new ArrayList<>(coords);
+		live_coords = new ArrayList<>(coords);
 	}
-	public ArrayList<Coordinate> getCoords(){
+
+	/**@return a list of Coordinates that this Ship occupies.*/
+	public ArrayList<Coordinate> getCoords() {
 		return coords;
 	}
 	
-	
-	/**
-	 * Checks if coord is a hit on the ship.
-	 * Returns nothing but removes the corresponding Coordinate object if hit.
+	/**Mark a Coordinate as hit by the opponent.
+	 *
+	 * @param coord the Coordinate to mark.
 	 */
-	public void shipHit(Coordinate coord)
-	{
-		Iterator<Coordinate> it = live_coords.iterator();
-		
-		while(it.hasNext()){
-			Coordinate shipCoord = it.next();
-			
-			if(shipCoord.equals(coord)){
-				it.remove();
-				return;
-			}
-		}
+	public void shipHit(Coordinate coord) {
+		live_coords.remove(coord);
 	}
 	
-	/**
-	 * Checks if coords contains any Coordinate objects.
-	 * @return True if no Coordinate objects exist in coords.
-	 */
-	public boolean noMoreShip()
-	{
-		if(live_coords.isEmpty()){
-			return true;
-		}
-		return false;
+	/**@return true if this Ship has been sunk.*/
+	public boolean noMoreShip() {
+		return live_coords.isEmpty();
 	}
 	
-	/**
-	 * Returns True if coords contains coord.
-	 * @return True if the ship contains the coordinate.
+	/**Check if this Ship occupies a Coordinate.
+	 *
+	 * @param coord the Coordinate to check.
+	 *
+	 * @return true if this Ship occupies the Coordinate, false otherwise.
 	 */
-	public boolean hasCoordinate(Coordinate coord)
-	{
-		for(Coordinate shipCoord : live_coords){
-			if(shipCoord.equals(coord)){
-				return true;
-			}
-		}
-		return false;
+	public boolean hasCoordinate(Coordinate coord) {
+		return live_coords.contains(coord);
 	}
 }
 

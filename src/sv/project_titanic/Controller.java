@@ -1,43 +1,39 @@
 package sv.project_titanic;
 
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+import java.util.ArrayList;
+import java.util.Iterator;
+
 import sv.project_titanic.model.*;
 import sv.project_titanic.connection.*;
 
-
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.awt.*;
-import java.awt.event.*;
-
-
+/**The heart of the game, handles all logic.*/
 public class Controller {
-  
-	private Board currentBoard;
 	private Board awayBoard;
 	private	Board homeBoard;
 	private boolean playerTurn;
-	private Ship ship;
-	private ArrayList<Coordinate> coord;
+
 	private Thread serverThread;
 	private TCPServer server;
 	private TCPClient client;
-	
-	
-  /**
-	 * Class constructor. 
+
+	/**Create and initialize a new controller. Creates a new TCPClient and adds
+	 * a listener to it to handle messages from the opponent.
+	 *
+	 * @param awayBoard opponent's Board.
+	 * @param homeBoard local player's Board.
 	 */
-	public Controller(Board ab, Board hb, boolean turn){
-		awayBoard = ab;
-		homeBoard = hb;
+	public Controller(Board awayBoard, Board homeBoard) {
+		this.awayBoard = awayBoard;
+		this.homeBoard = homeBoard;
 		playerTurn = false;
 
 		client = new TCPClient();
 
 		client.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				ClientActionEvent c = (ClientActionEvent)e;
-
-				Object message = c.getRecieveObject();
+				Object message = ((ClientActionEvent)e).getRecieveObject();
 
 				if(message instanceof Board)
 					initializeAwayBoard((Board)message);
@@ -49,24 +45,15 @@ public class Controller {
 		});
 	}
 
-	public void startGame() {
-		client.send(homeBoard);
-	}
-
-	public void initializeAwayBoard(Board board) {
-		awayBoard.copyBoard(board);
-	}
-
-	public void opponentsMove(int[] move) {
-		homeBoard.setFieldStatus(move[0], move[1], move[2]);
-
-		playerTurn = true;
-	}
-
+	/**Host a new game on port 6665 and join it.
+	 *
+	 * @return true if the server was started successfully and the game could
+	 *         be joined, fales otherwise.
+	 */
 	public boolean hostGame() {
 		server = new TCPServer(6665);
 		serverThread = new Thread(server);
-		
+
 		serverThread.start();
 
 		playerTurn = true;
@@ -74,175 +61,157 @@ public class Controller {
 		return joinGame("127.0.0.1");
 	}
 
+	/**Join an existing game.
+	 *
+	 * @param ip the ip address of the game.
+	 *
+	 * @return true if the game could be joined.
+	 */
 	public boolean joinGame(String ip) {
 		return client.connect(ip);
 	}
 
-	/**
-	 * Tries to shoot at a given coordinate.
-	 * @param x  	x-coordinate from event.
-	 * @param y 	y-coordinate from event.
+	/**Start a game by sending the local Board to the opponent.*/
+	public void startGame() {
+		client.send(homeBoard);
+	}
+
+	/**Copy the Board sent by the opponent into awayBoard.
+	 *
+	 * @param board the opponents Board.
 	 */
-	public void shoot(Coordinate c){
-		
-		//int result = 0;
-		
-		
-		if(playerTurn){
-			currentBoard = awayBoard;
-			if(canPlaceShot(c)){
-				placeShot(c);
-				playerTurn = false;
-			}
-		}
-		if(isGameOver()){
-			System.out.println("GAME OVER");
+	public void initializeAwayBoard(Board board) {
+		awayBoard.copyBoard(board);
+	}
+
+	/**Register a move sent by the opponent and allow the local player to make
+	 * their next turn.
+	 *
+	 * @param move an array of the form {x, y, status}
+	 */
+	public void opponentsMove(int[] move) {
+		homeBoard.setFieldStatus(move[0], move[1], move[2]);
+
+		if(isGameOver())
 			exitGame();
+
+		playerTurn = true;
+	}
+
+	/**Let the local player shoot at the board. Change turns if the shot was
+	 * successful. Used as a callback from the GUI.
+	 *
+	 * @param coord the Coordinate to shoot at.
+	 */
+	public void shoot(Coordinate coord) {
+		if(playerTurn && placeShot(coord)) {
+			playerTurn = false;
+
+			if(isGameOver())
+				exitGame();
 		}
 	}
-	/**
-	 * Reads the status of the coordinate.
-	 * @param c   object of coordinate.
-	 * @return 		true if coordinate not been shot before, otherwise false.
+
+	/**If possible, place a shot on the board, updating the status accordingly.
+	 *
+	 * @param coord the coord to place a shot at.
+	 *
+	 * @return true if a shot could be placed, false otherwise.
 	 */
-	public boolean canPlaceShot(Coordinate c){
-		int x = c.getX();		
-		int y = c.getY();
-		
-		int status = currentBoard.getFieldStatus(x,y);
-						
-		if(status == 0 || status == 2){
-			return true;
-		} else {
-			return false;
-		}
-	}
-	/**
-	 * Place a shot on the given coordinate. 
-	 * @param c   object containing coordinate.
-	 * @return 
-	 */
-	public void placeShot(Coordinate c){
-		
-		int x = c.getX();
-		int y = c.getY();
-			
-		int status = currentBoard.getFieldStatus(x,y);
-			
-		if(status == 1 || status == 3){
-			//Redan beskjuten ruta.
+	public boolean placeShot(Coordinate coord) {
+		int x = coord.getX();
+		int y = coord.getY();
 
-		}else if(status == 0){
+		int status = awayBoard.getFieldStatus(x, y);
 
-			currentBoard.setFieldStatus(x,y,1);
-			int[] message = {x, y, 1};
-			client.send(message);
+		switch(status) {
+			case 0:
+				updateStatus(x, y, 1);
+				return true;
 
-		} else{
-			for(Ship ship : currentBoard.getFleet()){
-				if(ship.hasCoordinate(c)){
-					ship.shipHit(c);
-					
-					if(ship.noMoreShip()){
-						for(Coordinate cc : ship.getCoords()){
-							currentBoard.setFieldStatus(cc.getX(), cc.getY(), 4);
-							int[] message = {cc.getX(), cc.getY(), 4};
-							client.send(message);
-						}
-					}else{
-						currentBoard.setFieldStatus(x,y,3);
-						int[] message = {x, y, 3};
-						client.send(message);
-					}
-					break;
+			case 2:
+				Ship ship = awayBoard.getShipByCoord(coord);
+
+				ship.shipHit(coord);
+
+				if(ship.noMoreShip()) {
+					for(Coordinate c : ship.getCoords())
+						updateStatus(c.getX(), c.getY(), 4);
 				}
-			}
-		}
-		
-		//currentBoard.setFieldStatus(x,y,status+1);
+				else {
+					updateStatus(x, y, 3);
+				}
 
-		
-	}
-	/**
-	 * Checks if fleet still contains coordinate. If it does, 
-	 * all ships are not sunk and game continues.
-	 * @return 		true if fleet is empty, otherwise false.
-	 */
-	public boolean isGameOver(){
-		for(Ship ship : awayBoard.getFleet()){
-			if(!ship.noMoreShip()){
-				return false;				
-			}
+				return true;
 		}
-		return true;
+
+		return false;
 	}
-	/**
-	 * Checks if the players wants to play another run.
-	 * @return		true if another run shall me played.
+
+	/**Update the status of a coordinate and send the same info to the
+	 * opponent.
+	 *
+	 * @param x x-coordinate of cell to update.
+	 * @param y y-coordinate of cell to update.
+	 * @param status the new status.
 	 */
+	public void updateStatus(int x, int y, int status) {
+		int[] message = {x, y, status};
+		client.send(message);
+		awayBoard.setFieldStatus(x, y, status);
+	}
+
+	/**@return true if a player has lost all ships, false otherwise.*/
+	public boolean isGameOver() {
+		return awayBoard.allShipsSunk() || homeBoard.allShipsSunk();
+	}
+
 	public boolean replay(){
 		return false;
 	}
-	/**
-	 * Kills the game.
-	 */
+
+	/**Quit the game.*/
 	public void exitGame(){
 		System.exit(0);
 	}
 	
-	/**
-	 * Check if the ship can be placed on the board.
-	 * @param s 	object of a ship.
-	 * @return 		true if able to place ship, otherwise false.
+	/**Check if a Ship can be placed on the homeBoard without collision.
+	 *
+	 * @param ship the ship to place.
+	 *
+	 * @return true if the Ship can be placed, false otherwise.
 	 */
-	public boolean canPlaceShip(Ship s){
-		Iterator<Coordinate> itr = s.getCoords().iterator();
-		
-		while(itr.hasNext()){
-			Coordinate currentCoord = itr.next();
+	public boolean canPlaceShip(Ship ship) {
+		for(Coordinate c : ship.getCoords()) {
+			int x = c.getX();
+			int y = c.getY();
 
-			int x = currentCoord.getX();
-			int y = currentCoord.getY();
-
-			// Är vi utanför spelbrädan?
-			if(x >= homeBoard.getYdim() || y >= homeBoard.getXdim()){
+			if(x >= homeBoard.getYdim() || y >= homeBoard.getXdim())
 				return false;
-			}
 
-			//Om det redan finns en båt på denna koordinat.
-			if(homeBoard.getFieldStatus(x,y) != 0){
+			if(homeBoard.getFieldStatus(x, y) != 0)
 				return false;
-			}
 		}
 
 		return true;
 	}
 	
-	/**
-	 * Places a ship on the grid.
-	 * @param s 	object of a ship.
-	 * @throws 		FieldOccupiedException if the field already 
-	 * 				    has a ship placed on that coordinate.
-	 */	
-	public void placeShip(Ship s){
-		Iterator<Coordinate> itr = s.getCoords().iterator();
+	/**Place a Ship on the Boad, if possible.
+	 *
+	 * @param ship the Ship to place.
+	 *
+	 * @return true if the Ship could be placed, false otherwise.
+	 */
+	public boolean placeShip(Ship ship) {
+		if(!canPlaceShip(ship))
+			return false;
 
-		while(itr.hasNext()){
-			Coordinate newCoord = itr.next();
+		for(Coordinate c : ship.getCoords())	
+			homeBoard.setFieldStatus(c.getX(), c.getY(), 2);
 
-			int x = newCoord.getX();
-			int y = newCoord.getY();
+		homeBoard.addShip(ship);
 
-			int status = homeBoard.getFieldStatus(x,y);
-
-			if( status == 2){
-
-			} else {
-				homeBoard.setFieldStatus(x,y,2);
-			}
-			
-		}
-		homeBoard.addShip(s);
+		return true;
 	}
 }
 
