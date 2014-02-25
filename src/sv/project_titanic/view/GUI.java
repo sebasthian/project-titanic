@@ -12,6 +12,7 @@ import java.util.List;
 import javax.swing.*;
 import javax.swing.border.*;
 
+/**Main GUI class for Battleship.*/
 public class GUI extends JFrame implements Runnable {
 	public final static HashMap<Integer, Color> COLOR_MAP;
 	static {
@@ -38,6 +39,14 @@ public class GUI extends JFrame implements Runnable {
 	private String orientation;
 	private Grid shipInitGrid;
 
+	/**Create a new GUI that can be run on the Swing Event Dispatch Thread.
+	 *
+	 * @param homeBoard home player's Board.
+	 * @param awayBoard opponent's Board.
+	 * @param homePlayer local player.
+	 * @param awayPlayer the opponent.
+	 * @param controller ref to the Controller.
+	 */
 	public GUI(Board homeBoard, Board awayBoard, Player homePlayer, Player awayPlayer, Controller controller) {
 		this.controller = controller;
 
@@ -58,6 +67,9 @@ public class GUI extends JFrame implements Runnable {
 		turnMessage = new JLabel("Your turn");
 	}
 
+	/**Create a new Ship. Used when placing ships on the board during the init
+	 * phase.
+	 */
 	private Ship makeShip() {
 		ArrayList<Coordinate> coords = new ArrayList<>();
 
@@ -75,6 +87,9 @@ public class GUI extends JFrame implements Runnable {
 		return new Ship(coords);
 	}
 
+	/**Try placing a Ship on the homeBoard. If the ship can be placed, cycle
+	 * to the next Ship. otherwise, do nothing.
+	 */
 	private void placeShip() {
 		if(selectedShip != -1 && shipInitGrid.hasSelection()) {
 			Ship ship = makeShip();
@@ -90,6 +105,7 @@ public class GUI extends JFrame implements Runnable {
 		}
 	}
 
+	/**Make the preview text shown when placing ships during init.*/
 	private String getPreviewText() {
 		if(selectedShip == -1)
 			return "All ships placed!";
@@ -97,6 +113,7 @@ public class GUI extends JFrame implements Runnable {
 			return "Size: " + selectedShip + "\n" + "Orientation: " + orientation;
 	}
 
+	/**Spawn the game window.*/
 	public void run() {
 		setTitle("Project Titanic");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -117,6 +134,7 @@ public class GUI extends JFrame implements Runnable {
 		setVisible(true);
 	}
 
+	/**Create the main menu.*/
 	private JPanel buildMenuCard() {
 		JPanel menuCard = new JPanel(new GridBagLayout());
 
@@ -156,7 +174,7 @@ public class GUI extends JFrame implements Runnable {
 		return buttonPanel;
 	}
 
-
+	/**Create the init panel for placing ships on the board.*/
 	private JPanel buildShipInitCard() {
 		JPanel shipInitCard = new JPanel(new BorderLayout());
 
@@ -216,7 +234,8 @@ public class GUI extends JFrame implements Runnable {
 
 		return shipInitCard;
 	}
-	
+
+	/**Create the main game panel.*/
 	private JPanel buildMainGameCard() {
 		JPanel mainGameCard = new JPanel(new BorderLayout());
 
