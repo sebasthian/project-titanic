@@ -4,15 +4,18 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Observable;
 
 import sv.project_titanic.model.*;
 import sv.project_titanic.connection.*;
 
 /**The heart of the game, handles all logic.*/
-public class Controller {
+public class Controller extends Observable {
 	private Board awayBoard;
 	private	Board homeBoard;
 	private boolean playerTurn;
+	private Player homePlayer;
+	private Player awayPlayer;
 
 	private Thread serverThread;
 	private TCPServer server;
@@ -28,6 +31,8 @@ public class Controller {
 		this.awayBoard = awayBoard;
 		this.homeBoard = homeBoard;
 		playerTurn = false;
+		this.homePlayer = new Player("Player 1");
+		this.awayPlayer = new Player("Player 2");
 
 		client = new TCPClient();
 
@@ -37,6 +42,8 @@ public class Controller {
 
 				if(message instanceof Board)
 					initializeAwayBoard((Board)message);
+				else if(message instanceof Player)
+					awayPlayer.setName(((Player)message).getName());
 				else if(message instanceof int[])
 					opponentsMove((int[])message);
 				else if(message instanceof String)
@@ -44,6 +51,9 @@ public class Controller {
 			}
 		});
 	}
+
+	public Player getHomePlayer() { return homePlayer; }
+	public Player getAwayPlayer() { return awayPlayer; }
 
 	/**Host a new game on port 6665 and join it.
 	 *
@@ -57,6 +67,8 @@ public class Controller {
 		serverThread.start();
 
 		playerTurn = true;
+		setChanged();
+		notifyObservers("Your turn");
 
 		return joinGame("127.0.0.1");
 	}
@@ -71,8 +83,9 @@ public class Controller {
 		return client.connect(ip);
 	}
 
-	/**Start a game by sending the local Board to the opponent.*/
+	/**Start a game by sending the local Player and Board to the opponent.*/
 	public void startGame() {
+		client.send(homePlayer);
 		client.send(homeBoard);
 	}
 
@@ -96,6 +109,8 @@ public class Controller {
 			exitGame();
 
 		playerTurn = true;
+		setChanged();
+		notifyObservers("Your turn");
 	}
 
 	/**Let the local player shoot at the board. Change turns if the shot was
@@ -106,6 +121,8 @@ public class Controller {
 	public void shoot(Coordinate coord) {
 		if(playerTurn && placeShot(coord)) {
 			playerTurn = false;
+			setChanged();
+			notifyObservers("Opponent's turn");
 
 			if(isGameOver())
 				exitGame();

@@ -27,9 +27,9 @@ public class GUI extends JFrame implements Runnable {
 	//Main game data
 	private Grid homeGrid;
 	private Grid awayGrid;
-	private JLabel homePlayer;
-	private JLabel awayPlayer;
-	private JLabel turnMessage;
+	private ObserverLabel homePlayer;
+	private ObserverLabel awayPlayer;
+	private ObserverLabel turnMessage;
 	private JButton initDoneButton;
 	private Controller controller;
 
@@ -47,7 +47,7 @@ public class GUI extends JFrame implements Runnable {
 	 * @param awayPlayer the opponent.
 	 * @param controller ref to the Controller.
 	 */
-	public GUI(Board homeBoard, Board awayBoard, Player homePlayer, Player awayPlayer, Controller controller) {
+	public GUI(Board homeBoard, Board awayBoard, Controller controller) {
 		this.controller = controller;
 
 		homeGrid = new Grid(homeBoard.getYdim(), homeBoard.getYdim(), false);
@@ -62,9 +62,14 @@ public class GUI extends JFrame implements Runnable {
 		selectedShip = shipLengths.get(0);
 		orientation = "horizontal";
 
-		this.homePlayer = new JLabel(homePlayer.getName());
-		this.awayPlayer = new JLabel(awayPlayer.getName());
-		turnMessage = new JLabel("Your turn");
+		homePlayer = new ObserverLabel(controller.getHomePlayer().getName());
+		controller.getHomePlayer().addObserver(homePlayer);
+
+		awayPlayer = new ObserverLabel(controller.getAwayPlayer().getName());
+		controller.getAwayPlayer().addObserver(awayPlayer);
+
+		turnMessage = new ObserverLabel("Opponent's turn");
+		controller.addObserver(turnMessage);
 	}
 
 	/**Create a new Ship. Used when placing ships on the board during the init
@@ -144,6 +149,9 @@ public class GUI extends JFrame implements Runnable {
 		JButton hostGameButton = new JButton("Host Game");
 		hostGameButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				String name = JOptionPane.showInputDialog("Enter your name:");
+				controller.getHomePlayer().setName(name);
+
 				controller.hostGame();
 				CardLayout layout = (CardLayout)getContentPane().getLayout();
 				layout.next(getContentPane());
@@ -154,6 +162,9 @@ public class GUI extends JFrame implements Runnable {
 		JButton joinGameButton = new JButton("Join Game");
 		joinGameButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				String name = JOptionPane.showInputDialog("Enter your name:");
+				controller.getHomePlayer().setName(name);
+
 				String host = JOptionPane.showInputDialog("Enter IP Address of Host:");
 				controller.joinGame(host);
 				

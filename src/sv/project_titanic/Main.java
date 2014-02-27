@@ -12,12 +12,9 @@ public class Main {
         Board homeBoard = new Board(10, 10);
         Board awayBoard = new Board(10, 10);
 
-        Player homePlayer = new Player("player1");
-        Player awayPlayer = new Player("player2");
-
         Controller controller = new Controller(awayBoard, homeBoard);
 
-        GUI gui = new GUI(homeBoard, awayBoard, homePlayer, awayPlayer, controller);
+        GUI gui = new GUI(homeBoard, awayBoard, controller);
 
         SwingUtilities.invokeLater(gui);
     }
