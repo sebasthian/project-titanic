@@ -21,6 +21,7 @@ public class TCPClient
 	public TCPClient() {	
 	}
 	
+	/**Disconnect from the server.*/
 	public void disconnect() {
 		try {
 			clientSocket.close();
