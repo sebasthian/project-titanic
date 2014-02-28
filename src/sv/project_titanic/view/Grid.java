@@ -29,7 +29,7 @@ public class Grid extends JPanel implements Observer {
 	 *
 	 * @param rows the height of the grid
 	 * @param columns the width of the grid
-	 * @param highlighting Cells are highlighted on mouseover if true.
+	 * @param active Cells are highlighted on mouseover if true.
 	 */
 	public Grid(int rows, int columns, boolean active) {
 		rowCount = rows;

@@ -58,7 +58,7 @@ public class Controller extends Observable {
 	/**Host a new game on port 6665 and join it.
 	 *
 	 * @return true if the server was started successfully and the game could
-	 *         be joined, fales otherwise.
+	 *         be joined, false otherwise.
 	 */
 	public boolean hostGame() {
 		server = new TCPServer(6665);
@@ -218,7 +218,7 @@ public class Controller extends Observable {
 		return true;
 	}
 	
-	/**Place a Ship on the Boad, if possible.
+	/**Place a Ship on the Board, if possible.
 	 *
 	 * @param ship the Ship to place.
 	 *

@@ -45,8 +45,6 @@ public class GUI extends JFrame implements Runnable, Observer {
 	 *
 	 * @param homeBoard home player's Board.
 	 * @param awayBoard opponent's Board.
-	 * @param homePlayer local player.
-	 * @param awayPlayer the opponent.
 	 * @param controller ref to the Controller.
 	 */
 	public GUI(Board homeBoard, Board awayBoard, Controller controller) {
