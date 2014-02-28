@@ -6,13 +6,15 @@ import java.io.Serializable;
 /**Class for handling player data.*/
 public class Player extends Observable implements Serializable {
 	private String name;
+	private boolean local;
 	
 	/**Create a new player.
 	 *
 	 * @param name the name of the Player.
 	 */
-	public Player(String name) {
+	public Player(String name, boolean local) {
 		this.name = name;
+		this.local = local;
 	}
 
 	/**@param name a new name for this player.*/
@@ -25,5 +27,10 @@ public class Player extends Observable implements Serializable {
 	/**@return the name of this player.*/
 	public String getName() {
 		return name;
+	}
+
+	/**@return true if this is a local player*/
+	public boolean isLocal() {
+		return local;
 	}
 }

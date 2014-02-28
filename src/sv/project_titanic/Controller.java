@@ -31,8 +31,8 @@ public class Controller extends Observable {
 		this.awayBoard = awayBoard;
 		this.homeBoard = homeBoard;
 		playerTurn = false;
-		this.homePlayer = new Player("Player 1");
-		this.awayPlayer = new Player("Player 2");
+		this.homePlayer = new Player("Player 1", true);
+		this.awayPlayer = new Player("Player 2", false);
 
 		client = new TCPClient();
 
@@ -105,12 +105,17 @@ public class Controller extends Observable {
 	public void opponentsMove(int[] move) {
 		homeBoard.setFieldStatus(move[0], move[1], move[2]);
 
-		if(isGameOver())
-			exitGame();
+		Coordinate coord = new Coordinate(move[0], move[1]);
+		Ship ship = homeBoard.getShipByCoord(coord);
+		if(ship != null)
+			ship.shipHit(coord);
 
 		playerTurn = true;
 		setChanged();
 		notifyObservers("Your turn");
+
+		if(isGameOver())
+			exitGame();
 	}
 
 	/**Let the local player shoot at the board. Change turns if the shot was

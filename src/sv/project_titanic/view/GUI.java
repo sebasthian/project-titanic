@@ -9,11 +9,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 import javax.swing.*;
 import javax.swing.border.*;
 
 /**Main GUI class for Battleship.*/
-public class GUI extends JFrame implements Runnable {
+public class GUI extends JFrame implements Runnable, Observer {
 	public final static HashMap<Integer, Color> COLOR_MAP;
 	static {
 		COLOR_MAP = new HashMap<>();
@@ -27,9 +29,9 @@ public class GUI extends JFrame implements Runnable {
 	//Main game data
 	private Grid homeGrid;
 	private Grid awayGrid;
-	private ObserverLabel homePlayer;
-	private ObserverLabel awayPlayer;
-	private ObserverLabel turnMessage;
+	private JLabel homePlayer;
+	private JLabel awayPlayer;
+	private JLabel turnMessage;
 	private JButton initDoneButton;
 	private Controller controller;
 
@@ -62,14 +64,24 @@ public class GUI extends JFrame implements Runnable {
 		selectedShip = shipLengths.get(0);
 		orientation = "horizontal";
 
-		homePlayer = new ObserverLabel(controller.getHomePlayer().getName());
-		controller.getHomePlayer().addObserver(homePlayer);
+		homePlayer = new JLabel(controller.getHomePlayer().getName());
+		awayPlayer = new JLabel(controller.getAwayPlayer().getName());
+		turnMessage = new JLabel("Opponent's turn");
 
-		awayPlayer = new ObserverLabel(controller.getAwayPlayer().getName());
-		controller.getAwayPlayer().addObserver(awayPlayer);
+		controller.getHomePlayer().addObserver(this);
+		controller.getAwayPlayer().addObserver(this);
+		controller.addObserver(this);
+	}
 
-		turnMessage = new ObserverLabel("Opponent's turn");
-		controller.addObserver(turnMessage);
+	public void update(Observable o, Object arg) {
+		if(o instanceof Controller)
+			turnMessage.setText((String)arg);
+		else if(o instanceof Player) {
+			if(((Player)o).isLocal())
+				homePlayer.setText((String)arg);
+			else
+				awayPlayer.setText((String)arg);
+		}
 	}
 
 	/**Create a new Ship. Used when placing ships on the board during the init
