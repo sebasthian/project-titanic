@@ -134,6 +134,7 @@ public class GUI extends JFrame implements Runnable, Observer {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		setLayout(new CardLayout());
+		((JComponent)getContentPane()).setBorder(new EmptyBorder(6, 2, 2, 2));
 
 		JPanel menuCard = buildMenuCard();
 		add(menuCard);
@@ -153,8 +154,7 @@ public class GUI extends JFrame implements Runnable, Observer {
 	private JPanel buildMenuCard() {
 		JPanel menuCard = new JPanel(new GridBagLayout());
 
-		JPanel buttonPanel = new JPanel(new GridLayout(0, 1));
-		buttonPanel.setPreferredSize(new Dimension(100, 150));
+		JPanel buttonPanel = new JPanel(new GridLayout(0, 1, 20, 20));
 
 		JButton hostGameButton = new JButton("Host Game");
 		hostGameButton.addActionListener(new ActionListener() {
@@ -192,7 +192,9 @@ public class GUI extends JFrame implements Runnable, Observer {
 		});
 		buttonPanel.add(exitButton);
 
-		return buttonPanel;
+		menuCard.add(buttonPanel);
+
+		return menuCard;
 	}
 
 	/**Create the init panel for placing ships on the board.*/
@@ -202,12 +204,14 @@ public class GUI extends JFrame implements Runnable, Observer {
 		JPanel mainArea = new JPanel(new GridLayout(1, 2, 6, 0));
 		mainArea.add(shipInitGrid);
 
-		JPanel shipPreviewPane = new JPanel(new GridLayout(0, 1));
-		shipPreviewPane.add(new JLabel("Ship to place:"));
+		JPanel shipPreviewContainer = new JPanel(new GridBagLayout());
 
-		final JTextArea shipPreview = new JTextArea(getPreviewText());
+		JPanel shipPreviewPanel = new JPanel(new GridLayout(0, 1));
+		shipPreviewPanel.add(new JLabel("Ship to place:"));
+
+		final JTextArea shipPreview = new JTextArea(getPreviewText(), 3, 15);
 		shipPreview.setEditable(false);
-		shipPreviewPane.add(shipPreview);
+		shipPreviewPanel.add(shipPreview);
 
 		shipInitGrid.addMouseListener(new MouseAdapter() {
 			@Override
@@ -234,11 +238,15 @@ public class GUI extends JFrame implements Runnable, Observer {
 			}
 		});
 
-		shipPreviewPane.add(rotateButton);
+		shipPreviewPanel.add(rotateButton);
 
-		mainArea.add(shipPreviewPane);
+		shipPreviewContainer.add(shipPreviewPanel);
+
+		mainArea.add(shipPreviewContainer);
 
 		shipInitCard.add(mainArea, BorderLayout.CENTER);
+
+		JPanel finishButtonPanel = new JPanel(new GridBagLayout());
 
 		initDoneButton = new JButton("Finished");
 		initDoneButton.setEnabled(false);
@@ -251,7 +259,11 @@ public class GUI extends JFrame implements Runnable, Observer {
 			}
 		});
 
-		shipInitCard.add(initDoneButton, BorderLayout.SOUTH);
+		finishButtonPanel.add(initDoneButton);
+
+		finishButtonPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
+
+		shipInitCard.add(finishButtonPanel, BorderLayout.SOUTH);
 
 		return shipInitCard;
 	}
@@ -269,8 +281,6 @@ public class GUI extends JFrame implements Runnable, Observer {
 		statusArea.add(turnMessage, BorderLayout.CENTER);
 
 		mainGameCard.add(statusArea, BorderLayout.NORTH);
-
-		mainGameCard.add(new JLabel("Maybe an exit button down here."), BorderLayout.SOUTH);
 
 		JPanel gameArea = new JPanel(new GridLayout(1, 2, 6, 0));
 		gameArea.setBorder(new EmptyBorder(6, 6, 6, 6));
