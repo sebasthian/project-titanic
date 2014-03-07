@@ -107,15 +107,24 @@ public class Controller extends Observable {
 
 		Coordinate coord = new Coordinate(move[0], move[1]);
 		Ship ship = homeBoard.getShipByCoord(coord);
-		if(ship != null)
+		
+		if(ship != null) {
 			ship.shipHit(coord);
+			if(ship.noMoreShip()) {
+				for(Coordinate c : ship.getCoords())
+					homeBoard.setFieldStatus(c.getX(), c.getY(), 4);
+			}
+		}
 
-		playerTurn = true;
 		setChanged();
-		notifyObservers("Your turn");
 
-		if(isGameOver())
-			exitGame();
+		if(homeBoard.allShipsSunk()) {
+			notifyObservers(awayPlayer);
+		}
+		else {
+			playerTurn = true;
+			notifyObservers("Your turn");
+		}
 	}
 
 	/**Let the local player shoot at the board. Change turns if the shot was
@@ -129,8 +138,10 @@ public class Controller extends Observable {
 			setChanged();
 			notifyObservers("Opponent's turn");
 
-			if(isGameOver())
-				exitGame();
+			if(awayBoard.allShipsSunk()) {
+				setChanged();
+				notifyObservers(homePlayer);
+			}
 		}
 	}
 
@@ -155,13 +166,11 @@ public class Controller extends Observable {
 				Ship ship = awayBoard.getShipByCoord(coord);
 
 				ship.shipHit(coord);
+				updateStatus(x, y, 3);
 
 				if(ship.noMoreShip()) {
 					for(Coordinate c : ship.getCoords())
-						updateStatus(c.getX(), c.getY(), 4);
-				}
-				else {
-					updateStatus(x, y, 3);
+						awayBoard.setFieldStatus(c.getX(), c.getY(), 4);
 				}
 
 				return true;
@@ -183,17 +192,12 @@ public class Controller extends Observable {
 		awayBoard.setFieldStatus(x, y, status);
 	}
 
-	/**@return true if a player has lost all ships, false otherwise.*/
-	public boolean isGameOver() {
-		return awayBoard.allShipsSunk() || homeBoard.allShipsSunk();
-	}
-
-	public boolean replay(){
+	public boolean replay() {
 		return false;
 	}
 
 	/**Quit the game.*/
-	public void exitGame(){
+	public void exitGame() {
 		System.exit(0);
 	}
 	
@@ -220,11 +224,16 @@ public class Controller extends Observable {
 	
 	/**Place a Ship on the Board, if possible.
 	 *
-	 * @param ship the Ship to place.
+	 * @param coord where to place the ship
+	 * @param orientation Either "horizontal" or "vertical". The Ship will 
+	 *                    extend to the right or downwards, respectively.
+	 * @param size how many coordinates the Ship should occupy
 	 *
 	 * @return true if the Ship could be placed, false otherwise.
 	 */
-	public boolean placeShip(Ship ship) {
+	public boolean placeShip(Coordinate coord, String orientation, int size) {
+		Ship ship = makeShip(coord, orientation, size);
+
 		if(!canPlaceShip(ship))
 			return false;
 
@@ -234,6 +243,30 @@ public class Controller extends Observable {
 		homeBoard.addShip(ship);
 
 		return true;
+	}
+
+	/**Create a new Ship.
+	 *
+	 * @param coord where to place the ship
+	 * @param orientation Either "horizontal" or "vertical". The Ship will 
+	 *                    extend to the right or downwards, respectively.
+	 * @param size how many coordinates the Ship should occupy
+	 *
+	 * @return a new Ship object.
+	 */
+	private Ship makeShip(Coordinate coord, String orientation, int size) {
+		ArrayList<Coordinate> coords = new ArrayList<>();
+
+		if(orientation == "horizontal") {
+			for(int i = 0; i < size; i++)
+				coords.add(new Coordinate(coord.getX() + i, coord.getY()));
+		}
+		else if(orientation == "vertical") {
+			for(int i = 0; i < size; i++)
+				coords.add(new Coordinate(coord.getX(), coord.getY() + i));
+		}
+
+		return new Ship(coords);
 	}
 }
 

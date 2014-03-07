@@ -72,51 +72,29 @@ public class GUI extends JFrame implements Runnable, Observer {
 	}
 
 	public void update(Observable o, Object arg) {
-		if(o instanceof Controller)
-			turnMessage.setText((String)arg);
+		if(o instanceof Controller) {
+			if(arg instanceof String) {
+				turnMessage.setText((String)arg);
+			}
+			else if(arg instanceof Player) {
+				Player winner = (Player)arg;
+
+				String message;
+				if(winner.isLocal())
+					message = "A winner is you!";
+				else
+					message = "You lose!";
+
+				JOptionPane.showMessageDialog(this, message);
+
+				controller.exitGame();
+			}
+		}
 		else if(o instanceof Player) {
 			if(((Player)o).isLocal())
 				homePlayer.setText((String)arg);
 			else
 				awayPlayer.setText((String)arg);
-		}
-	}
-
-	/**Create a new Ship. Used when placing ships on the board during the init
-	 * phase.
-	 */
-	private Ship makeShip() {
-		ArrayList<Coordinate> coords = new ArrayList<>();
-
-		Coordinate cell = shipInitGrid.getSelectedCell();
-
-		if(orientation == "horizontal") {
-			for(int i = 0; i < selectedShip; i++)
-				coords.add(new Coordinate(cell.getX() + i, cell.getY()));
-		}
-		else if(orientation == "vertical") {
-			for(int i = 0; i < selectedShip; i++)
-				coords.add(new Coordinate(cell.getX(), cell.getY() + i));
-		}
-
-		return new Ship(coords);
-	}
-
-	/**Try placing a Ship on the homeBoard. If the ship can be placed, cycle
-	 * to the next Ship. otherwise, do nothing.
-	 */
-	private void placeShip() {
-		if(selectedShip != -1 && shipInitGrid.hasSelection()) {
-			Ship ship = makeShip();
-
-			if(controller.placeShip(ship)) {
-				shipLengths.remove(selectedShip);
-
-				if(shipLengths.size() == 0)
-					selectedShip = -1;
-				else
-					selectedShip = shipLengths.get(0);
-			}
 		}
 	}
 
@@ -130,7 +108,7 @@ public class GUI extends JFrame implements Runnable, Observer {
 
 	/**Spawn the game window.*/
 	public void run() {
-		setTitle("Project Titanic");
+		setTitle("Sink das Båt");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		setLayout(new CardLayout());
@@ -159,7 +137,7 @@ public class GUI extends JFrame implements Runnable, Observer {
 		JButton hostGameButton = new JButton("Host Game");
 		hostGameButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				String name = JOptionPane.showInputDialog("Enter your name:");
+				String name = JOptionPane.showInputDialog(GUI.this, "Enter your name:");
 				controller.getHomePlayer().setName(name);
 
 				controller.hostGame();
@@ -172,10 +150,10 @@ public class GUI extends JFrame implements Runnable, Observer {
 		JButton joinGameButton = new JButton("Join Game");
 		joinGameButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				String name = JOptionPane.showInputDialog("Enter your name:");
+				String name = JOptionPane.showInputDialog(GUI.this, "Enter your name:");
 				controller.getHomePlayer().setName(name);
 
-				String host = JOptionPane.showInputDialog("Enter IP Address of Host:");
+				String host = JOptionPane.showInputDialog(GUI.this, "Enter IP Address of Host:");
 				controller.joinGame(host);
 				
 				CardLayout layout = (CardLayout)getContentPane().getLayout();
@@ -216,13 +194,23 @@ public class GUI extends JFrame implements Runnable, Observer {
 		shipInitGrid.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				placeShip();
+				if(selectedShip != -1
+				   && shipInitGrid.hasSelection()
+				   && controller.placeShip(shipInitGrid.getSelectedCell(), orientation, selectedShip)
+			    ) {
+					shipLengths.remove(selectedShip);
 
-				if(selectedShip == -1) 
-					initDoneButton.setEnabled(true);
+					if(shipLengths.size() == 0) {
+						selectedShip = -1;
+						initDoneButton.setEnabled(true);
+					}
+					else {
+						selectedShip = shipLengths.get(0);
+					}
 
-				shipPreview.setText(getPreviewText());
-				repaint();
+					shipPreview.setText(getPreviewText());
+					repaint();
+				}
 			}
 		});
 
